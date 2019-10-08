@@ -64,5 +64,7 @@ where it provides value.
 
 ### Members
 
+<-- Please add yourself in alphabetical order by Github handle -->
+
 * [@fenghaolw](https://github.com/fenghaolw) - Hao Feng
-* [@github-handle](https://github.com/github-handle) - Name
+* [@jkrems](https://github.com/jkrems) - Jan Krems
