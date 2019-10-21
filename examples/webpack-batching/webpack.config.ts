@@ -11,7 +11,7 @@ const config: webpack.Configuration = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
-    chunkFilename: 'chunk.[id].js',
+    chunkFilename: 'chunk.[name].js',
     publicPath: '/assets/',
   },
   optimization: {
@@ -20,17 +20,28 @@ const config: webpack.Configuration = {
     },
     splitChunks: {
       chunks: 'all',
-      minSize: 0,
-      name: false,
+      minSize: 1,
+      maxAsyncRequests: 100000,
+      maxInitialRequests: 100000,
+      name: true,
       cacheGroups: {
-        default: false,
+        vendors: false,
       },
     },
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'static'),
-    before(app, server) {
+    after(app, server) {
       const {compiler} = server as unknown as {compiler: webpack.Compiler};
+
+      const entryChunks = new Map();
+      compiler.hooks.emit.tap('DevServer', compilation => {
+        entryChunks.clear();
+        for (const [name, entrypoint] of compilation.entrypoints) {
+          const files = [].concat(...entrypoint.chunks.map(c => c.files));
+          entryChunks.set(name, files);
+        }
+      });
 
       const outputOptions = compiler.options.output;
       // We know that the FS supports both input and output methods.
@@ -39,15 +50,13 @@ const config: webpack.Configuration = {
       app.use((req, res, next) => {
         if (req.url.startsWith(outputOptions.publicPath)) {
           const assetPath = req.url.slice(outputOptions.publicPath.length);
-          // TODO: Actually check for entrypoints being requested directly
-          const [, jsEntry] = assetPath.match(/^([\w-]+)\.js$/) || [];
-          if (jsEntry) {
-            // Assemble!
-            // For now, let's use a static assembler. A super. Static. Assembler.
-            const files = ['chunk.runtime', 'chunk.0', `chunk.${jsEntry}`];
+
+          const jsEntryName = assetPath.endsWith('.js') ? assetPath.slice(0, -3) : null;
+          if (jsEntryName !== null && entryChunks.has(jsEntryName)) {
             const output = [];
-            for (const prefix of files) {
-              const absoluteFile = path.resolve(outputOptions.path, `${prefix}.js`);
+            for (const filename of entryChunks.get(jsEntryName)) {
+              output.push(Buffer.from(`\n/* File: ${filename} */\n`));
+              const absoluteFile = path.resolve(outputOptions.path, filename);
               const fileContents = outFS.readFileSync(absoluteFile);
               output.push(fileContents);
             }
