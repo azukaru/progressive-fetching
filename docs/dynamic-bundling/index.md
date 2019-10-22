@@ -14,7 +14,7 @@ This makes using a simple file server impossible but offers the following advant
   The correct code fragment can then be dynamically selected while assembling the bundle.
   For `n` feature flags, we only need `O(n)` files.
     - Build-time assembly, on the other hand, is forced to combine files that use many different feature flags,
-      which means generating `O(2n)` output files for `n` feature flags.
+      which means generating `O(2^n)` output files for `n` feature flags.
 * The content of files can be templated, e.g. to inline minor variants without duplicating big chunks of code in the outputs.
 
 This general idea has been implemented to varying degrees by different companies and organizations over the years:
