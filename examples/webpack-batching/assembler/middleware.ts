@@ -90,6 +90,26 @@ export function serveBundle(compiler) {
           chunkNames: [jsEntryName],
           chunkIds: [],
           contentType: ContentType.JS_SCRIPT,
+          includeDeps: true,
+        };
+
+        // TODO: Properly send the content
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.send(assemble(chunkset, options));
+        return;
+      }
+
+      if (jsEntryName && jsEntryName.startsWith('chunk.')) {
+        const chunkIds = jsEntryName
+          .slice('chunk.'.length)
+          .split(',')
+          .map(id => parseInt(id, 10));
+
+        const options: AssemblyOptions = {
+          chunkNames: [],
+          chunkIds: chunkIds,
+          contentType: ContentType.JS_SCRIPT,
+          includeDeps: false,
         };
 
         // TODO: Properly send the content

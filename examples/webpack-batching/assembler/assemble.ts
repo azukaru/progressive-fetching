@@ -6,6 +6,7 @@ export interface AssemblyOptions {
   chunkIds: number[];
   chunkNames: string[];
   contentType: ContentType;
+  includeDeps: boolean;
 };
 
 export interface Part {
@@ -23,7 +24,12 @@ export interface Chunkset {
   chunks: Chunk[];
 }
 
-function* collectParts(chunkset: Chunkset, indices: number[]): Generator<Part> {
+function* collectParts(chunkset: Chunkset, options: AssemblyOptions): Generator<Part> {
+  const {includeDeps} = options;
+  const indices = options.chunkIds.concat(options.chunkNames.map(name => {
+    return chunkset.names.get(name);
+  }));
+
   const visited = new Set<number>();
 
   function* visitChunk(index: number) {
@@ -35,10 +41,12 @@ function* collectParts(chunkset: Chunkset, indices: number[]): Generator<Part> {
     const ownParts = [];
 
     for (const ownPart of chunk.parts) {
+      ownParts.push(ownPart);
+      if (!includeDeps) continue;
+
       for (const depIdx of ownPart.dependsOn) {
         yield* visitChunk(depIdx);
       }
-      ownParts.push(ownPart);
     }
 
     yield* ownParts;
@@ -52,11 +60,8 @@ function* collectParts(chunkset: Chunkset, indices: number[]): Generator<Part> {
 export function assemble(chunkset: Chunkset, options: AssemblyOptions): Uint8Array {
   const js: Uint8Array[] = [];
 
-  const chunkIds = options.chunkIds.concat(options.chunkNames.map(name => {
-    return chunkset.names.get(name);
-  }));
 
-  for (const part of collectParts(chunkset, chunkIds)) {
+  for (const part of collectParts(chunkset, options)) {
     js.push(part.getBody());
   }
 

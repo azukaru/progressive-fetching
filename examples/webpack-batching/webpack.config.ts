@@ -3,6 +3,7 @@ import path from 'path';
 import webpack from 'webpack';
 
 import {serveBundle} from './assembler/middleware';
+import BatchDynamicPlugin from './assembler/batch-dynamic-plugin';
 
 const config: webpack.Configuration = {
   context: __dirname,
@@ -45,7 +46,10 @@ function makeFinegrained(config: webpack.Configuration): webpack.Configuration {
   }
 
   config.output = config.output || {};
-  config.output.chunkFilename = 'chunk.[name].js';
+  config.output.chunkFilename = 'chunk.[id].js';
+
+  config.plugins = config.plugins || [];
+  config.plugins.push(new BatchDynamicPlugin());
 
   config.devServer = config.devServer || {};
   const previousAfter = config.devServer.after;
