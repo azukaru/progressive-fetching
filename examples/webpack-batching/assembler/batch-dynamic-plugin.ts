@@ -16,20 +16,32 @@ function loadingEnded4() {
   return returnValue;
 }
 
+function getWebpack5JsonpHook(compilation) {
+  const JsonpTemplatePlugin = require('webpack/lib/web/JsonpTemplatePlugin');
+  return JsonpTemplatePlugin.getCompilationHooks(compilation).jsonpScript;
+}
+
 class BatchDynamicPlugin {
   apply(compiler: webpack.Compiler) {
     compiler.hooks.compilation.tap(BatchDynamicPlugin.name, (compilation) => {
-      compilation.mainTemplate.hooks.jsonpScript.tap(BatchDynamicPlugin.name, (src, chunk, hash) => {
+      let jsonpScriptHook = compilation.mainTemplate.hooks.jsonpScript;
+      if (!jsonpScriptHook) {
+        // webpack 5 removed this from the mainTemplate
+        jsonpScriptHook = getWebpack5JsonpHook(compilation);
+      }
+      jsonpScriptHook.tap(BatchDynamicPlugin.name, (src, chunk, hash) => {
         const {
           crossOriginLoading,
           chunkLoadTimeout,
           jsonpScriptType
         } = compilation.outputOptions;
 
-        const {requireFn} = compilation.mainTemplate;
+        const requireFn = '__webpack_require__';
 
         const scriptNonce = `${requireFn}.nc`;
         const activeBatch = `${requireFn}._ab`;
+        const publicPath = `${requireFn}.p`;
+        const getChunkScriptFilename = `${requireFn}.u`;
 
         return Template.asString([
           "var script;",
@@ -52,7 +64,7 @@ class BatchDynamicPlugin {
             "Promise.resolve().then(function () {",
             Template.indent([
               `${activeBatch} = null;`,
-              "script.src = jsonpScriptSrc(batch.map(c => c.id).join(','));",
+              `script.src = ${publicPath} + ${getChunkScriptFilename}(batch.map(c => c.id).join(','));`,
               crossOriginLoading
                 ? Template.asString([
                   "if (script.src.indexOf(window.location.origin + '/') !== 0) {",

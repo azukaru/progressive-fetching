@@ -47,6 +47,7 @@ function makeFinegrained(config: webpack.Configuration): webpack.Configuration {
 
   config.output = config.output || {};
   config.output.chunkFilename = 'chunk.[id].js';
+  config.output.filename = 'chunk.[id].js';
 
   config.plugins = config.plugins || [];
   config.plugins.push(new BatchDynamicPlugin());
