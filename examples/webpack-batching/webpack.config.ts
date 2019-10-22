@@ -12,7 +12,6 @@ const config: webpack.Configuration = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
     chunkFilename: 'chunk.[name].js',
     publicPath: '/assets/',
   },
@@ -25,10 +24,6 @@ const config: webpack.Configuration = {
       minSize: 1,
       maxAsyncRequests: 100000,
       maxInitialRequests: 100000,
-      name: true,
-      cacheGroups: {
-        vendors: false,
-      },
     },
   },
   devServer: {
