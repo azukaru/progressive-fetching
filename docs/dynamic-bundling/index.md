@@ -9,8 +9,8 @@ This makes using a simple file server impossible but offers the following advant
 
 * Reduced network requests caused by code splitting.
   Very fine-grained splitting strategies can be used without the overhead and latency anomalies that come with tens or hundreds of individual requests.
-* Reduced number of output files (and build runtime) when generating many variants.
-  E.g. each use of a feature flag (or experiment) can be isolated into one small chunk.
+* Reduced number of output files (and build duration) when generating many variants.
+  E.g. each use of a feature flag (or experiment) can be isolated into one chunk.
   The correct code fragment can then be dynamically selected while assembling the bundle.
   For `n` feature flags, we only need `O(n)` files.
     - Build-time assembly, on the other hand, is forced to combine files that use many different feature flags,
