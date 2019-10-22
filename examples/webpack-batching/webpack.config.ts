@@ -39,6 +39,10 @@ function makeFinegrained(config: webpack.Configuration): webpack.Configuration {
     maxAsyncRequests: 100000,
     maxInitialRequests: 100000,
   });
+  // Force numeric chunk ids
+  if (!config.optimization.chunkIds || config.optimization.chunkIds === 'named') {
+    config.optimization.chunkIds = 'natural';
+  }
 
   config.output = config.output || {};
   // TODO: Make this remote compatible with potential existing configs.

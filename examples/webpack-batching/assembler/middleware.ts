@@ -10,8 +10,23 @@ function buildChunksetFromCompilation(fs: webpack.InputFileSystem, outputPath: s
 
   const chunks: Chunk[] = [];
 
-  for (const webpackChunk of (compilation.chunks as webpack.compilation.Chunk[])) {
+  const sortedChunks = [
+    ...(compilation.chunks as webpack.compilation.Chunk[])
+  ].sort(
+    (a, b) => {
+      if (typeof a.id !== 'number' || typeof b.id !== 'number') {
+        throw new Error('Only numeric chunk ids are supported');
+      }
+      return a.id - b.id;
+    }
+  );
+
+  for (const webpackChunk of sortedChunks) {
     const chunkIdx = chunks.length;
+    if (chunkIdx !== webpackChunk.id) {
+      // This may happen if there are holes in the chunk ids
+      throw new Error(`Expected chunk id ${chunkIdx} but found ${webpackChunk.id}`);
+    }
     if (webpackChunk.name) {
       names.set(webpackChunk.name, chunkIdx);
     }
