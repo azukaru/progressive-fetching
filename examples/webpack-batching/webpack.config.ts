@@ -45,7 +45,6 @@ function makeFinegrained(config: webpack.Configuration): webpack.Configuration {
   }
 
   config.output = config.output || {};
-  // TODO: Make this remote compatible with potential existing configs.
   config.output.chunkFilename = 'chunk.[name].js';
 
   config.devServer = config.devServer || {};
