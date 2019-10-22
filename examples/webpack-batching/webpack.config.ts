@@ -12,27 +12,47 @@ const config: webpack.Configuration = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    chunkFilename: 'chunk.[name].js',
     publicPath: '/assets/',
   },
   optimization: {
-    runtimeChunk: {
-      name: 'chunk.runtime',
-    },
-    splitChunks: {
-      chunks: 'all',
-      minSize: 1,
-      maxAsyncRequests: 100000,
-      maxInitialRequests: 100000,
-    },
+    // Optionally, set runtime chunk.
+    runtimeChunk: 'single',
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'static'),
-    after(app, server) {
-      const {compiler} = server as unknown as {compiler: webpack.Compiler};
-      app.use(serveBundle(compiler));
-    },
   },
 };
 
-export default config;
+/**
+ * Take "normal" webpack config that doesn't generate multiple initial requests,
+ * adds settings that make it work for dynamic bundling.
+ *
+ * This assumes that the app will try to load `foo.js` for the entrypoint `foo`.
+ */
+function makeFinegrained(config: webpack.Configuration): webpack.Configuration {
+  config.optimization = config.optimization || {};
+  config.optimization.splitChunks = config.optimization.splitChunks || {};
+
+  Object.assign(config.optimization.splitChunks, {
+    chunks: 'all',
+    minSize: 1,
+    maxAsyncRequests: 100000,
+    maxInitialRequests: 100000,
+  });
+
+  config.output = config.output || {};
+  // TODO: Make this remote compatible with potential existing configs.
+  config.output.chunkFilename = 'chunk.[name].js';
+
+  config.devServer = config.devServer || {};
+  const previousAfter = config.devServer.after;
+  config.devServer.after = (app, server) => {
+    if (previousAfter) previousAfter(app, server);
+    const {compiler} = server as unknown as {compiler: webpack.Compiler};
+    app.use(serveBundle(compiler));
+  };
+
+  return config;
+}
+
+export default makeFinegrained(config);
