@@ -2,6 +2,11 @@ import webpack from 'webpack';
 
 const {Template} = webpack;
 
+/**
+ * Simulate the chunk loaded callback in webpack 4. Could be dropped if we don't
+ * care about working with webpack 4. This function is stringified and will run
+ * in the browser. `installedChunks` comes from the scope it gets inserted into.
+ */
 function loadingEnded4() {
   var returnValue = null;
   // @ts-ignore
@@ -16,8 +21,12 @@ function loadingEnded4() {
   return returnValue;
 }
 
-function getWebpack5JsonpHook(compilation) {
-  const JsonpTemplatePlugin = require('webpack/lib/web/JsonpTemplatePlugin');
+/**
+ * In webpack 5, the hook moved from the mainTemplate to its own plugin.
+ */
+function getWebpack5JsonpHook(compilation: webpack.compilation.Compilation) {
+  // @ts-ignore
+  const {JsonpTemplatePlugin} = webpack.web;
   return JsonpTemplatePlugin.getCompilationHooks(compilation).jsonpScript;
 }
 
@@ -45,6 +54,8 @@ class BatchDynamicPlugin {
 
         return Template.asString([
           "var script;",
+          // DIFF: We create a batch entry and then have an if/else to either
+          // start a new batch or add it to an existing batch if one exists.
           `var batchEntry = { id: chunkId, done: typeof loadingEnded === 'function' ? loadingEnded : ${loadingEnded4} };`,
           `if (!${activeBatch}) {`,
           Template.indent([
@@ -61,9 +72,13 @@ class BatchDynamicPlugin {
               `script.setAttribute("nonce", ${scriptNonce});`
             ),
             "}",
+            // DIFF: This delays the actual fetch by a microtick. In the original
+            // implementation of this hook, it's done immediately.
             "Promise.resolve().then(function () {",
             Template.indent([
               `${activeBatch} = null;`,
+              // DIFF: In the original implementation, the script url is generated
+              // earlier and this is just `script.src = url;`.
               `script.src = ${publicPath} + ${getChunkScriptFilename}(batch.map(c => c.id).join(','));`,
               crossOriginLoading
                 ? Template.asString([
@@ -81,6 +96,9 @@ class BatchDynamicPlugin {
                 "// avoid mem leaks in IE.",
                 "script.onerror = script.onload = null;",
                 "clearTimeout(timeout);",
+                // DIFF: We have multiple chunks in the batch, so we have to iterate.
+                // Originally (in webpack 5), the `loadingEnded` function replaces
+                // `chunk.done()`. We capture those callbacks above.
                 "for (var chunk of batch) {",
                 Template.indent([
                   "var reportError = chunk.done();",
@@ -110,6 +128,10 @@ class BatchDynamicPlugin {
           ]),
           `} else {`,
           Template.indent([
+            // DIFF: The surrounding code assumes that this code always generates
+            // a local `script` variable that can be appended to the DOM. So even
+            // when we're adding to a batch, we need to generate some kind of DOM
+            // node. So we're adding comments. Also helps with debugging!
             "var onScriptComplete;",
             `${activeBatch}.push(batchEntry);`,
             "script = document.createComment(' Chunk ' + chunkId + ' queued ');",
