@@ -1,6 +1,6 @@
 import webpack from 'webpack';
 
-const Template = require('webpack/lib/Template');
+const {Template} = webpack;
 
 function loadingEnded4() {
   var returnValue = null;
