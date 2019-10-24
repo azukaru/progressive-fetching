@@ -1,5 +1,10 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 
+function toChunkNames(props) {
+  const {page} = props.__NEXT_DATA__;
+  return ['_app', page.replace(/^\//, '')].join(',');
+}
+
 function HackyNextScript(props) {
   return <>
     <script
@@ -11,7 +16,7 @@ function HackyNextScript(props) {
         __html: NextScript.getInlineScriptSource(props),
       }}
     />
-    <script async src="/api/chunks"></script>
+    <script async src={`/api/chunks?chunkNames=${toChunkNames(props)}`}></script>
   </>;
 }
 

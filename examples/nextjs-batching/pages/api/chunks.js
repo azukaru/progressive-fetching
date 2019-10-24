@@ -59,12 +59,19 @@ function loadChunkset() {
   };
 }
 
+function parseChunkNames(chunkNames) {
+  if (!chunkNames || typeof chunkNames !== 'string') {
+    return [];
+  }
+  return chunkNames.split(',');
+}
+
 export default (req, res) => {
   const chunkset = loadChunkset();
   /** @type {import('../../../assembler/assemble').AssemblyOptions} */
   const options = {
     chunkIds: [],
-    chunkNames: ['_app', 'robin'],
+    chunkNames: parseChunkNames(req.query.chunkNames),
     contentType: ContentType.JS_SCRIPT,
     includeDeps: true,
   };
