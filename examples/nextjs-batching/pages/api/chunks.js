@@ -11,7 +11,12 @@ function loadJSON(...segments) {
  * @returns {import('../../../assembler/assemble').Chunkset}
  */
 function loadChunkset() {
-  const buildId = fs.readFileSync(path.resolve('.next', 'BUILD_ID'), 'utf8');
+  let buildId = 'development';
+  try {
+    buildId = fs.readFileSync(path.resolve('.next', 'BUILD_ID'), 'utf8');
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
   const manifest = loadJSON('.next', 'build-manifest.json');
 
   const chunks = [];
@@ -30,7 +35,10 @@ function loadChunkset() {
         {
           key: -1,
           getBody() {
-            return fs.readFileSync(`.next/${filename}`);
+            return Buffer.concat([
+              fs.readFileSync(`.next/${filename}`),
+              Buffer.from('\n'),
+            ]);
           },
           dependsOn: [],
         },

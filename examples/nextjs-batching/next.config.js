@@ -19,6 +19,13 @@ module.exports = {
    * @param {*} context
    */
   webpack(config, { isServer, dev /*, webpack */ }) {
+    // TODO: Handle DLL plugin when building either the chunk list or the deps
+    // inside of the chunkset.
+    config.plugins = config.plugins.filter(plugin => {
+      const {name} = plugin.constructor;
+      return name !== 'AutoDLLPlugin';
+    });
+
     if (isServer || dev) return config;
 
     // console.log(config.output);
