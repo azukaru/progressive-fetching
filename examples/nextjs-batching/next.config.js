@@ -14,6 +14,10 @@ function merge(target, overrides) {
 }
 
 module.exports = {
+  experimental: {
+    granularChunks: true,
+  },
+
   /**
    * @param {import('webpack').Configuration} config
    * @param {*} context

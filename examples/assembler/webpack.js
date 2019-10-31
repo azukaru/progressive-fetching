@@ -4,12 +4,15 @@ import BatchDynamicPlugin from './batch-dynamic-plugin';
 import {serveBundle} from './middleware';
 
 /**
-* Take "normal" webpack config that doesn't generate multiple initial requests,
-* adds settings that make it work for dynamic bundling.
-*
-* This assumes that the app will try to load `foo.js` for the entrypoint `foo`.
-*/
-export function makeFinegrained(config: webpack.Configuration): webpack.Configuration {
+ * Take "normal" webpack config that doesn't generate multiple initial requests,
+ * adds settings that make it work for dynamic bundling.
+ *
+ * This assumes that the app will try to load `foo.js` for the entrypoint `foo`.
+ *
+ * @param {webpack.Configuration} config
+ * @returns {webpack.Configuration}
+ */
+export function makeFinegrained(config) {
   config.optimization = config.optimization || {};
   config.optimization.splitChunks = config.optimization.splitChunks || {};
 
@@ -31,11 +34,14 @@ export function makeFinegrained(config: webpack.Configuration): webpack.Configur
   config.plugins = config.plugins || [];
   config.plugins.push(new BatchDynamicPlugin());
 
+  // @ts-ignore
   config.devServer = config.devServer || {};
+  // @ts-ignore
   const previousAfter = config.devServer.after;
+  // @ts-ignore
   config.devServer.after = (app, server) => {
     if (previousAfter) previousAfter(app, server);
-    const {compiler} = server as unknown as {compiler: webpack.Compiler};
+    const {compiler} = server;
     app.use(serveBundle(compiler));
   };
 

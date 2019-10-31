@@ -1,4 +1,4 @@
-import webpack from 'webpack';
+const webpack = require('webpack');
 
 const {Template} = webpack;
 
@@ -23,15 +23,20 @@ function loadingEnded4() {
 
 /**
  * In webpack 5, the hook moved from the mainTemplate to its own plugin.
+ *
+ * @param {webpack.compilation.Compilation} compilation
  */
-function getWebpack5JsonpHook(compilation: webpack.compilation.Compilation) {
+function getWebpack5JsonpHook(compilation) {
   // @ts-ignore
   const {JsonpTemplatePlugin} = webpack.web;
   return JsonpTemplatePlugin.getCompilationHooks(compilation).jsonpScript;
 }
 
 class BatchDynamicPlugin {
-  apply(compiler: webpack.Compiler) {
+  /**
+   * @param {webpack.Compiler} compiler
+   */
+  apply(compiler) {
     compiler.hooks.compilation.tap(BatchDynamicPlugin.name, (compilation) => {
       let jsonpScriptHook = compilation.mainTemplate.hooks.jsonpScript;
       if (!jsonpScriptHook) {
@@ -142,5 +147,4 @@ class BatchDynamicPlugin {
     });
   }
 }
-
-export default BatchDynamicPlugin;
+module.exports = BatchDynamicPlugin;

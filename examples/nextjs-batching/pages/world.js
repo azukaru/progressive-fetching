@@ -8,7 +8,7 @@ console.log('Code to render World was loaded');
 function render(props) {
   return <>
     <Greet {...props} />
-    <Link href="/robin">
+    <Link href="/hello/[name]" as="/hello/robin">
       <a>To Robin</a>
     </Link>
   </>;

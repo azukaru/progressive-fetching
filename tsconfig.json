@@ -1,7 +1,14 @@
 {
   "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["node"],
     "target": "esnext"
-  }
+  },
+  "include": [
+    "examples/assembler/*.js"
+  ]
 }

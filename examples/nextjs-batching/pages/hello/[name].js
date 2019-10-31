@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-import Greet from '../components/greet';
+import Greet from '../../components/greet';
 
 console.log('Code to render Robin was loaded');
 
@@ -16,5 +16,5 @@ function render(props) {
 export default render;
 
 render.getInitialProps = ({ query }) => {
-  return { name: 'Robin', ...query };
+  return query;
 };

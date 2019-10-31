@@ -1,17 +1,34 @@
-import path from 'path';
+'use strict';
 
-import webpack from 'webpack';
+const path = require('path');
 
-import {Chunk, Chunkset, AssemblyOptions, assemble, ContentType} from './assemble';
+const webpack = require('webpack');
 
-function buildChunksetFromCompilation(fs: webpack.InputFileSystem, outputPath: string, compilation: webpack.compilation.Compilation): Chunkset {
-  const names = new Map<string, number>();
-  const chunkMapping = new Map<webpack.compilation.Chunk, Chunk>();
+const {assemble, ContentTypes} = require('./assemble');
 
-  const chunks: Chunk[] = [];
+/**
+ * @typedef {import('./assemble').AssemblyOptions} AssemblyOptions
+ * @typedef {import('./assemble').Chunk} Chunk
+ * @typedef {import('./assemble').Chunkset} Chunkset
+ */
+
+/**
+ * @param {import('webpack').InputFileSystem} fs
+ * @param {string} outputPath
+ * @param {import('webpack').compilation.Compilation} compilation
+ * @returns {Chunkset}
+ */
+function buildChunksetFromCompilation(fs, outputPath, compilation) {
+  /** @type {Map<string, number>} */
+  const names = new Map();
+  /** @type {Map<any, Chunk>} */
+  const chunkMapping = new Map();
+
+  /** @type {Chunk[]} */
+  const chunks = [];
 
   const sortedChunks = [
-    ...(compilation.chunks as webpack.compilation.Chunk[])
+    ...(/** @type {webpack.compilation.Chunk[]} */ (compilation.chunks))
   ].sort(
     (a, b) => {
       if (typeof a.id !== 'number' || typeof b.id !== 'number') {
@@ -73,7 +90,8 @@ function buildChunksetFromCompilation(fs: webpack.InputFileSystem, outputPath: s
 export function serveBundle(compiler) {
   const outputOptions = compiler.options.output;
   // We know that the FS supports both input and output methods.
-  const outFS = compiler.outputFileSystem as unknown as webpack.InputFileSystem;
+  /** @type {webpack.InputFileSystem} */
+  const outFS = compiler.outputFileSystem;
 
   let chunkset = null;
   compiler.hooks.emit.tap('DevServer', compilation => {
@@ -86,10 +104,11 @@ export function serveBundle(compiler) {
 
       const jsEntryName = assetPath.endsWith('.js') ? assetPath.slice(0, -3) : null;
       if (jsEntryName !== null && chunkset.names.has(jsEntryName)) {
-        const options: AssemblyOptions = {
+        /** @type {AssemblyOptions} */
+        const options = {
           chunkNames: [jsEntryName],
           chunkIds: [],
-          contentType: ContentType.JS_SCRIPT,
+          contentType: ContentTypes.JS_SCRIPT,
           includeDeps: true,
         };
 
@@ -105,10 +124,11 @@ export function serveBundle(compiler) {
           .split(',')
           .map(id => parseInt(id, 10));
 
-        const options: AssemblyOptions = {
+        /** @type {AssemblyOptions} */
+        const options = {
           chunkNames: [],
           chunkIds: chunkIds,
-          contentType: ContentType.JS_SCRIPT,
+          contentType: ContentTypes.JS_SCRIPT,
           includeDeps: false,
         };
 
