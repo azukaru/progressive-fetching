@@ -1,0 +1,27 @@
+{
+  "name": "asset-assembler",
+  "version": "0.0.0-pre.0",
+  "description": "Turns many assets into one",
+  "license": "Apache-2.0",
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-node"
+      ]
+    ]
+  },
+  "scripts": {
+    "build": "pika-pack build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@pika/pack": "^0.5.0",
+    "@pika/plugin-build-node": "^0.7.1",
+    "@pika/plugin-ts-standard-pkg": "^0.7.1",
+    "@types/node": "^10.12.18",
+    "typescript": "^3.0.0"
+  }
+}

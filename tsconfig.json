@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "noEmit": true,
-    "allowJs": true,
-    "checkJs": true,
+    "outDir": "./pkg",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node"],
-    "target": "esnext"
+    "types": ["node", "jest"],
+    "module": "esnext",
+    "target": "es2019"
   },
   "include": [
-    "examples/assembler/*.js"
+    "packages/*/src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.js"
   ]
 }

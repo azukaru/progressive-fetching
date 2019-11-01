@@ -7,14 +7,24 @@
     "@types/source-map": "^0.5.2",
     "@types/webpack": "^4.39.5",
     "@types/webpack-dev-server": "^3.1.7",
+    "jest": "^24.9.0",
+    "lerna": "^3.18.3",
     "next": "^9.1.1",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "source-map": "^0.7.3",
+    "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.2"
+  },
+  "dependencies": {
+    "@types/jest": "^24.0.21"
+  },
+  "scripts": {
+    "publish-all": "lerna publish from-package --contents pkg",
+    "test": "jest"
   }
 }
