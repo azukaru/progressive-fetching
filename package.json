@@ -1,7 +1,7 @@
 {
   "name": "@progressive-fetching/webpack-batching",
   "description": "General example of using webpack with fine-grained chunks and batching",
-  "version": "0.0.0-pre.0",
+  "version": "0.0.0-pre.2",
   "private": true,
   "devDependencies": {
     "@types/node": "^12.11.2",
@@ -23,6 +23,9 @@
   },
   "dependencies": {
     "@types/jest": "^24.0.21"
+  },
+  "publishConfig": {
+    "registry": "https://wombat-dressing-room.appspot.com"
   },
   "scripts": {
     "publish-all": "lerna publish from-package --contents pkg",

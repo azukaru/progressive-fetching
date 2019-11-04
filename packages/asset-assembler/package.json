@@ -17,7 +17,6 @@
   "scripts": {
     "build": "pika build"
   },
-  "dependencies": {},
   "devDependencies": {
     "@pika/pack": "^0.5.0",
     "@pika/plugin-build-node": "^0.7.1",
@@ -27,5 +26,6 @@
   },
   "publishConfig": {
     "registry": "https://wombat-dressing-room.appspot.com"
-  }
+  },
+  "gitHead": "0dd9a58a483de2d4b3cdef19b6b1f6da150b6945"
 }
