@@ -1,7 +1,7 @@
 {
-  "name": "asset-assembler",
+  "name": "webpack-dynamic-bundle-plugin",
   "version": "0.0.0-pre.0",
-  "description": "Turns many assets into one",
+  "description": "Batches many asset requests into one",
   "license": "Apache-2.0",
   "main": "src/index",
   "@pika/pack": {
@@ -17,12 +17,18 @@
   "scripts": {
     "build": "pika-pack build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "asset-assembler": "^0.0.0-pre.0"
+  },
   "devDependencies": {
     "@pika/pack": "^0.5.0",
     "@pika/plugin-build-node": "^0.7.1",
     "@pika/plugin-ts-standard-pkg": "^0.7.1",
     "@types/node": "^10.12.18",
-    "typescript": "^3.0.0"
+    "canvas": "^2.6.0",
+    "jsdom": "^15.2.1",
+    "memfs": "^2.16.1",
+    "typescript": "^3.0.0",
+    "webpack": "^4.41.2"
   }
 }

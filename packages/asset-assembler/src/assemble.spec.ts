@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 
-import {assemble, Chunkset, AssemblyOptions, ContentType} from './assemble';
+import {assemble, Chunkset, AssemblyOptions, ContentType} from './index';
 
 function toUtf8(array: Uint8Array) {
   const decoder = new TextDecoder('utf-8');
