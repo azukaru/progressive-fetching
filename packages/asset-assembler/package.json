@@ -24,5 +24,8 @@
     "@pika/plugin-ts-standard-pkg": "^0.7.1",
     "@types/node": "^10.12.18",
     "typescript": "^3.0.0"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }
