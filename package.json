@@ -30,5 +30,21 @@
   "scripts": {
     "publish-all": "lerna publish from-package --contents pkg",
     "test": "jest"
-  }
+  },
+  "main": "jest.config.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azukaru/progressive-fetching.git"
+  },
+  "keywords": [],
+  "author": "Google",
+  "license": "Apache-2",
+  "bugs": {
+    "url": "https://github.com/azukaru/progressive-fetching/issues"
+  },
+  "homepage": "https://github.com/azukaru/progressive-fetching#readme"
 }
