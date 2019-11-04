@@ -1,16 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
-import { assemble, ContentType } from '../../../assembler/assemble';
+import {assemble, AssemblyOptions, Chunkset, ContentType} from 'asset-assembler';
 
 function loadJSON(...segments) {
   return JSON.parse(fs.readFileSync(path.resolve(...segments), 'utf8'));
 }
 
-/**
- * @returns {import('../../../assembler/assemble').Chunkset}
- */
-function loadChunkset() {
+function loadChunkset(): Chunkset {
   let buildId = 'development';
   try {
     buildId = fs.readFileSync(path.resolve('.next', 'BUILD_ID'), 'utf8');
@@ -48,7 +45,18 @@ function loadChunkset() {
     return chunkId;
   }
 
-  for (const [pageName, deps] of Object.entries(manifest.pages)) {
+  const chunkDir = path.resolve('.next', 'static', 'chunks');
+  const numberedChunks = fs.readdirSync(chunkDir).filter(filename => filename.endsWith('.js'));
+  numberedChunks.sort((a, b) => {
+    return parseInt(a.substr(0, a.indexOf('.')), 10) - parseInt(b.substr(0, b.indexOf('.')), 10);
+  });
+  // TODO: Handle situations where it's not a gap-less integer sequence
+  for (const numberedChunk of numberedChunks) {
+    getChunkIdForFilename(`static/chunks/${numberedChunk}`);
+  }
+
+  // TODO: Handle local dev where the manifest may be missing pages..?
+  for (const [pageName, deps] of Object.entries(manifest.pages) as [string, string[]][]) {
     const filename = `static/${buildId}/pages/${pageName}.js`;
     const chunkId = getChunkIdForFilename(filename);
     names.set(pageName.replace(/^\//, ''), chunkId);
@@ -67,6 +75,13 @@ function loadChunkset() {
   };
 }
 
+function parseChunkIds(chunkIds) {
+  if (!chunkIds || typeof chunkIds !== 'string') {
+    return [];
+  }
+  return chunkIds.split(',').map(id => parseInt(id, 10));
+}
+
 function parseChunkNames(chunkNames) {
   if (!chunkNames || typeof chunkNames !== 'string') {
     return [];
@@ -74,19 +89,41 @@ function parseChunkNames(chunkNames) {
   return chunkNames.split(',');
 }
 
-export default (req, res) => {
-  const chunkset = loadChunkset();
-  /** @type {import('../../../assembler/assemble').AssemblyOptions} */
-  const options = {
+function parseAssemblyOptions(arg) {
+  const options: AssemblyOptions = {
     chunkIds: [],
-    chunkNames: parseChunkNames(req.query.chunkNames),
+    chunkNames: [],
     contentType: ContentType.JS_SCRIPT,
     includeDeps: true,
   };
 
-  res.setHeader('Content-Type', 'text/javascript');
+  const [key, value] = arg.split('=');
+  switch (key) {
+    case 'i':
+      options.chunkIds.push(...parseChunkIds(value));
+      break;
 
-  res.end(assemble(chunkset, options));
+    case 'n':
+      options.chunkNames.push(...parseChunkNames(value));
+      break;
+
+    default:
+      throw new Error(`Unknown param type ${key}`);
+  }
+
+  return options;
+}
+
+export default (req, res) => {
+  const chunkset = loadChunkset();
+  const options: AssemblyOptions = parseAssemblyOptions(req.query.chunkIds);
+
+  res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+
+  const content = assemble(chunkset, options);
+
+  res.write(`/** ${JSON.stringify(options)} */\n`);
+  res.end(content);
 };
 
 export const config = {

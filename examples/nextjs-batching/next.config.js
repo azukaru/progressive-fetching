@@ -1,5 +1,7 @@
 'use strict';
 
+const {withDynamicBundle} = require('next-dynamic-bundle');
+
 /**
  * For type checking/completion purposes only. An `Object.assign` that forwards
  * the type of the first argument to the following arguments.
@@ -13,7 +15,7 @@ function merge(target, overrides) {
   return Object.assign(target, overrides);
 }
 
-module.exports = {
+module.exports = withDynamicBundle({
   experimental: {
     granularChunks: true,
   },
@@ -23,17 +25,7 @@ module.exports = {
    * @param {*} context
    */
   webpack(config, { isServer, dev /*, webpack */ }) {
-    // TODO: Handle DLL plugin when building either the chunk list or the deps
-    // inside of the chunkset.
-    config.plugins = config.plugins.filter(plugin => {
-      const {name} = plugin.constructor;
-      return name !== 'AutoDLLPlugin';
-    });
-
     if (isServer || dev) return config;
-
-    // console.log(config.output);
-    config.output.chunkFilename = 'static/chunks/[id].[contenthash].js';
 
     merge(config.optimization.splitChunks, {
       // Disable built-in next.js cache groups (e.g. commons)
@@ -55,4 +47,4 @@ module.exports = {
 
     return config;
   },
-};
+});

@@ -16,7 +16,7 @@ function HackyNextScript(props) {
       id="__NEXT_DATA__"
       type="application/json"
       nonce={props.nonce}
-      crossOrigin={props.crossOrigin || (process).crossOrigin}
+      crossOrigin={props.crossOrigin || (process as any).crossOrigin}
       dangerouslySetInnerHTML={{
         __html: NextScript.getInlineScriptSource(props),
       }}
@@ -34,11 +34,12 @@ class BundleDocument extends Document {
       <body>
         <Main />
         {/* <NextScript /> */}
-        <HackyNextScript {...this.props} />
+        <HackyNextScript {...(this as any).props} />
       </body>
       </Html>
     );
   }
 }
+(BundleDocument as any).contextType = Document.contextType;
 
-export default BundleDocument;
+export default Document;

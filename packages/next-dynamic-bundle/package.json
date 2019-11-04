@@ -1,0 +1,48 @@
+{
+  "name": "next-dynamic-bundle",
+  "version": "0.0.0-pre.4",
+  "description": "Enable dynamic bundle for next",
+  "author": "Google",
+  "homepage": "https://github.com/azukaru/progressive-fetching/tree/master/packages/next-dynamic-bundle#readme",
+  "license": "Apache-2.0",
+  "main": "src/index",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azukaru/progressive-fetching.git"
+  },
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-node"
+      ]
+    ]
+  },
+  "scripts": {
+    "build": "pika build"
+  },
+  "dependencies": {
+    "asset-assembler": "^0.0.0-pre.4",
+    "webpack-dynamic-bundle-plugin": "^0.0.0-pre.4"
+  },
+  "devDependencies": {
+    "@pika/pack": "^0.5.0",
+    "@pika/plugin-build-node": "^0.7.1",
+    "@pika/plugin-ts-standard-pkg": "^0.7.1",
+    "@types/node": "^10.12.18",
+    "next": "^9.1.2",
+    "react": "^16.11.0"
+  },
+  "publishConfig": {
+    "registry": "https://wombat-dressing-room.appspot.com"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/azukaru/progressive-fetching/issues"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "nextjs-batching",
+  "dependencies": {
+    "asset-assembler": "../../packages/asset-assembler/pkg",
+    "next-dynamic-bundle": "../../packages/next-dynamic-bundle/pkg",
+    "webpack-dynamic-bundle-plugin": "../../packages/webpack-dynamic-bundle-plugin/pkg"
+  }
+}
