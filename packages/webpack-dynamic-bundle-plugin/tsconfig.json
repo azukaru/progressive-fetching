@@ -4,7 +4,8 @@
     "outDir": "./pkg"
   },
   "include": [
-    "./src"
+    "./src",
+    "./link.d.ts"
   ],
   "exclude": [
     "**/*.spec.ts"

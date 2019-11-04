@@ -1,6 +1,6 @@
 {
   "name": "webpack-dynamic-bundle-plugin",
-  "version": "0.0.0-pre.0",
+  "version": "0.0.0-pre.1",
   "description": "Batches many asset requests into one",
   "license": "Apache-2.0",
   "main": "src/index",
@@ -15,7 +15,7 @@
     ]
   },
   "scripts": {
-    "build": "pika-pack build"
+    "build": "pika build"
   },
   "dependencies": {
     "asset-assembler": "^0.0.0-pre.0"
@@ -31,7 +31,7 @@
     "typescript": "^3.0.0",
     "webpack": "^4.41.2"
   },
-  "publishConfig":{
-    "registry":"https://wombat-dressing-room.appspot.com"
+  "publishConfig": {
+    "registry": "https://wombat-dressing-room.appspot.com"
   }
 }
