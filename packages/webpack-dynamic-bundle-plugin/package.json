@@ -1,6 +1,6 @@
 {
   "name": "webpack-dynamic-bundle-plugin",
-  "version": "0.0.0-pre.2",
+  "version": "0.0.0-pre.3",
   "description": "Batches many asset requests into one",
   "license": "Apache-2.0",
   "main": "src/index",
