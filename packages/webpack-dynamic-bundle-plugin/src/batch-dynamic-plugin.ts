@@ -29,6 +29,7 @@ function loadingEnded4() {
 function getWebpack5JsonpHook(compilation) {
   // @ts-ignore
   const {JsonpTemplatePlugin} = webpack.web;
+  if (!JsonpTemplatePlugin) return null;
   return JsonpTemplatePlugin.getCompilationHooks(compilation).jsonpScript;
 }
 
@@ -45,6 +46,9 @@ export default class DynamicBundlePlugin {
       if (!jsonpScriptHook) {
         // webpack 5 removed this from the mainTemplate
         jsonpScriptHook = getWebpack5JsonpHook(compilation);
+      }
+      if (!jsonpScriptHook) {
+        return;
       }
       jsonpScriptHook.tap(DynamicBundlePlugin.name, (src, chunk, hash) => {
         const {
