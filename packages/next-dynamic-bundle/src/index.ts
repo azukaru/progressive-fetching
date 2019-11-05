@@ -13,9 +13,9 @@ interface DynamicBundleOptions {
 }
 
 export function withDynamicBundle({prefix}: DynamicBundleOptions) {
-  function buildChunkUrl(webpackPrefix, chunkIds) {
-    return `${prefix}/js/i=${chunkIds.join(',')}`;
-  }
+  const buildChunkUrl = new Function('webpackPrefix', 'chunkIds', `\
+    return ${JSON.stringify(prefix)} + '/js/i=' + chunkIds.join(',');
+  `);
 
   return function applyDynamicBundle(nextConfig: NextConfig = {}) {
     return Object.assign({}, nextConfig, {
@@ -41,7 +41,9 @@ export function withDynamicBundle({prefix}: DynamicBundleOptions) {
           //   return entry;
           // };
         } else {
-          config.plugins.push(new DynamicBundlePlugin(buildChunkUrl));
+          config.plugins.push(new DynamicBundlePlugin(
+            buildChunkUrl as (prefix: string, ids: number[]) => string
+          ));
 
           if (dev) {
             config.output.chunkFilename = 'static/chunks/[id].js';
