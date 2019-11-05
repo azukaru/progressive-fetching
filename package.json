@@ -1,7 +1,7 @@
 {
   "name": "@progressive-fetching/webpack-batching",
   "description": "General example of using webpack with fine-grained chunks and batching",
-  "version": "0.0.0-pre.4",
+  "version": "0.0.0-pre.7",
   "private": true,
   "devDependencies": {
     "@types/node": "^12.11.2",
