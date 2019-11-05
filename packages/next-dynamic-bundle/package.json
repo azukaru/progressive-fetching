@@ -1,6 +1,6 @@
 {
   "name": "next-dynamic-bundle",
-  "version": "0.0.0-pre.8",
+  "version": "0.0.0-pre.9",
   "description": "Enable dynamic bundle for next",
   "author": "Google",
   "homepage": "https://github.com/azukaru/progressive-fetching/tree/master/packages/next-dynamic-bundle#readme",
@@ -27,8 +27,8 @@
     "build": "pika build"
   },
   "dependencies": {
-    "asset-assembler": "^0.0.0-pre.8",
-    "webpack-dynamic-bundle-plugin": "^0.0.0-pre.8"
+    "asset-assembler": "^0.0.0-pre.9",
+    "webpack-dynamic-bundle-plugin": "^0.0.0-pre.9"
   },
   "devDependencies": {
     "@pika/pack": "^0.5.0",
