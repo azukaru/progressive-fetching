@@ -1,4 +1,5 @@
 import webpack from 'webpack';
+import {SyncWaterfallHook} from 'tapable';
 
 const {Template} = webpack;
 
@@ -26,10 +27,23 @@ function loadingEnded4() {
  *
  * @param {webpack.compilation.Compilation} compilation
  */
-function getWebpack5JsonpHook(compilation) {
+function getWebpackJsonpHook(compilation) {
+  const {mainTemplate} = compilation;
+
   // @ts-ignore
   const {JsonpTemplatePlugin} = webpack.web;
-  if (!JsonpTemplatePlugin) return null;
+
+  if (!JsonpTemplatePlugin || !JsonpTemplatePlugin.getCompilationHooks) {
+    if (!mainTemplate.hooks.jsonpScript) {
+      mainTemplate.hooks.jsonpScript = new SyncWaterfallHook([
+        "source",
+        "chunk",
+        "hash"
+      ]);
+    }
+    return mainTemplate.hooks.jsonpScript;
+  }
+
   return JsonpTemplatePlugin.getCompilationHooks(compilation).jsonpScript;
 }
 
@@ -42,14 +56,7 @@ export default class DynamicBundlePlugin {
    */
   apply(compiler) {
     compiler.hooks.compilation.tap(DynamicBundlePlugin.name, (compilation) => {
-      let jsonpScriptHook = compilation.mainTemplate.hooks.jsonpScript;
-      if (!jsonpScriptHook) {
-        // webpack 5 removed this from the mainTemplate
-        jsonpScriptHook = getWebpack5JsonpHook(compilation);
-      }
-      if (!jsonpScriptHook) {
-        return;
-      }
+      let jsonpScriptHook = getWebpackJsonpHook(compilation);
       jsonpScriptHook.tap(DynamicBundlePlugin.name, (src, chunk, hash) => {
         const {
           crossOriginLoading,

@@ -115,6 +115,11 @@ function parseAssemblyOptions(arg) {
 }
 
 export default (req, res) => {
+  if (req.query.chunkIds.endsWith('.js.map')) {
+    res.setHeader('Content-Type', 'application/json');
+    res.end(Buffer.from('{}'));
+    return;
+  }
   const chunkset = loadChunkset();
   const options: AssemblyOptions = parseAssemblyOptions(req.query.chunkIds);
 
@@ -123,7 +128,7 @@ export default (req, res) => {
   const content = assemble(chunkset, options);
 
   res.write(`/** ${JSON.stringify(options)} */\n`);
-  res.end(content);
+  res.end(Buffer.from(content));
 };
 
 export const config = {

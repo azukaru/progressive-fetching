@@ -1,6 +1,6 @@
 {
   "name": "webpack-dynamic-bundle-plugin",
-  "version": "0.0.0-pre.7",
+  "version": "0.0.0-pre.8",
   "description": "Batches many asset requests into one",
   "license": "Apache-2.0",
   "main": "src/index",
@@ -18,7 +18,7 @@
     "build": "pika build"
   },
   "dependencies": {
-    "asset-assembler": "^0.0.0-pre.7"
+    "asset-assembler": "^0.0.0-pre.8"
   },
   "devDependencies": {
     "@pika/pack": "^0.5.0",
