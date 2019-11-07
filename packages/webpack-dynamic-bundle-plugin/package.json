@@ -1,6 +1,6 @@
 {
   "name": "webpack-dynamic-bundle-plugin",
-  "version": "0.0.0-pre.10",
+  "version": "0.0.0-pre.11",
   "description": "Batches many asset requests into one",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
     "dist"
   ],
   "dependencies": {
-    "asset-assembler": "^0.0.0-pre.10"
+    "asset-assembler": "^0.0.0-pre.11"
   },
   "devDependencies": {
     "canvas": "^2.6.0",

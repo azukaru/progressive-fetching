@@ -1,6 +1,6 @@
 {
   "name": "asset-assembler",
-  "version": "0.0.0-pre.10",
+  "version": "0.0.0-pre.11",
   "description": "Turns many assets into one",
   "license": "Apache-2.0",
   "main": "./dist/index.js",

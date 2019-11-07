@@ -1,6 +1,6 @@
 {
   "name": "next-dynamic-bundle",
-  "version": "0.0.0-pre.10",
+  "version": "0.0.0-pre.11",
   "description": "Enable dynamic bundle for next",
   "author": "Google",
   "homepage": "https://github.com/azukaru/progressive-fetching/tree/master/packages/next-dynamic-bundle#readme",
@@ -20,8 +20,8 @@
   "dependencies": {
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.4",
-    "asset-assembler": "^0.0.0-pre.10",
-    "webpack-dynamic-bundle-plugin": "^0.0.0-pre.10"
+    "asset-assembler": "^0.0.0-pre.11",
+    "webpack-dynamic-bundle-plugin": "^0.0.0-pre.11"
   },
   "devDependencies": {
     "next": "^9.1.2",
