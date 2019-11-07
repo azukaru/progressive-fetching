@@ -3,25 +3,15 @@
   "version": "0.0.0-pre.10",
   "description": "Turns many assets into one",
   "license": "Apache-2.0",
-  "main": "src/index",
-  "@pika/pack": {
-    "pipeline": [
-      [
-        "@pika/plugin-ts-standard-pkg"
-      ],
-      [
-        "@pika/plugin-build-node"
-      ]
-    ]
-  },
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "pika build"
+    "prepublishOnly": "tsc -b ."
   },
   "devDependencies": {
-    "@pika/pack": "^0.5.0",
-    "@pika/plugin-build-node": "^0.7.1",
-    "@pika/plugin-ts-standard-pkg": "^0.7.1",
-    "@types/node": "^10.12.18",
     "typescript": "^3.0.0"
   },
   "publishConfig": {

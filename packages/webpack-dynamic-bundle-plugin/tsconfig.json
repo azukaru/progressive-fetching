@@ -1,11 +1,14 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.base",
   "compilerOptions": {
-    "outDir": "./pkg"
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
+  "references": [
+    { "path": "../asset-assembler" }
+  ],
   "include": [
-    "./src",
-    "./link.d.ts"
+    "./src"
   ],
   "exclude": [
     "**/*.spec.ts"

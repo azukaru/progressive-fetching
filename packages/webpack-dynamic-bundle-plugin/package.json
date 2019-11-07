@@ -3,28 +3,18 @@
   "version": "0.0.0-pre.10",
   "description": "Batches many asset requests into one",
   "license": "Apache-2.0",
-  "main": "src/index",
-  "@pika/pack": {
-    "pipeline": [
-      [
-        "@pika/plugin-ts-standard-pkg"
-      ],
-      [
-        "@pika/plugin-build-node"
-      ]
-    ]
-  },
+  "main": "dist/index.js",
+  "typings": "./dist/index.d.ts",
   "scripts": {
-    "build": "pika build"
+    "prepublishOnly": "tsc -b ."
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "asset-assembler": "^0.0.0-pre.10"
   },
   "devDependencies": {
-    "@pika/pack": "^0.5.0",
-    "@pika/plugin-build-node": "^0.7.1",
-    "@pika/plugin-ts-standard-pkg": "^0.7.1",
-    "@types/node": "^10.12.18",
     "canvas": "^2.6.0",
     "jsdom": "^15.2.1",
     "memfs": "^2.16.1",

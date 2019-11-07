@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
-    "outDir": "./pkg",
+    "composite": true,
+    "outDir": "./dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "types": ["node", "jest"],
-    "module": "esnext",
+    "declaration": true,
+    "declarationMap": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "module": "commonjs",
     "target": "es2019"
   },
-  "include": [
-    "packages/*/src/**/*.ts"
-  ],
+  "files": [],
   "exclude": [
     "node_modules",
     "**/*.spec.js"

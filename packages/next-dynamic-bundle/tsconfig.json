@@ -1,14 +1,20 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react",
-    "outDir": "./pkg"
+    "types": ["react"],
+    "composite": true,
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
   "include": [
-    "./src",
-    "./link.d.ts"
+    "./src"
   ],
   "exclude": [
     "**/*.spec.ts"
+  ],
+  "references": [
+    { "path": "../asset-assembler" },
+    { "path": "../webpack-dynamic-bundle-plugin" }
   ]
 }

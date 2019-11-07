@@ -1,16 +1,11 @@
-// For a detailed explanation regarding each configuration property, visit:
-// https://jestjs.io/docs/en/configuration.html
+'use strict';
+
+const fs = require('fs');
 
 module.exports = {
-  preset: 'ts-jest',
-
-  collectCoverage: false,
-  coverageDirectory: "coverage",
-
-  // The test environment that will be used for testing
-  testEnvironment: "node",
-
-  modulePathIgnorePatterns: [
-    'packages/.*/pkg',
-  ],
+  projects: fs.readdirSync(__dirname + '/packages').map(pkgName => {
+    // Only include directories
+    if (pkgName.includes('.')) return null;
+    return `<rootDir>/packages/${pkgName}`;
+  }).filter(Boolean),
 };

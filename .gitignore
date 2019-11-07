@@ -4,4 +4,6 @@
 /examples/*/node_modules
 
 /packages/*/node_modules
-/packages/*/pkg
+/packages/*/dist
+
+*.tsbuildinfo

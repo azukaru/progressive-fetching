@@ -5,36 +5,25 @@
   "author": "Google",
   "homepage": "https://github.com/azukaru/progressive-fetching/tree/master/packages/next-dynamic-bundle#readme",
   "license": "Apache-2.0",
-  "main": "src/index",
+  "main": "dist/index.js",
+  "typings": "./dist/index.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azukaru/progressive-fetching.git"
   },
-  "@pika/pack": {
-    "pipeline": [
-      [
-        "@pika/plugin-ts-standard-pkg"
-      ],
-      [
-        "@pika/plugin-build-node"
-      ]
-    ]
-  },
   "scripts": {
-    "build": "pika build"
+    "prepublishOnly": "tsc -b ."
   },
   "dependencies": {
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
     "asset-assembler": "^0.0.0-pre.10",
     "webpack-dynamic-bundle-plugin": "^0.0.0-pre.10"
   },
   "devDependencies": {
-    "@pika/pack": "^0.5.0",
-    "@pika/plugin-build-node": "^0.7.1",
-    "@pika/plugin-ts-standard-pkg": "^0.7.1",
-    "@types/node": "^10.12.18",
     "next": "^9.1.2",
     "react": "^16.11.0"
   },

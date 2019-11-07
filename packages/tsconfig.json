@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "references": [
+    { "path": "asset-assembler" },
+    { "path": "next-dynamic-bundle" },
+    { "path": "webpack-dynamic-bundle-plugin" }
+  ]
+}
