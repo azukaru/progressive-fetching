@@ -9,6 +9,7 @@
     "declarationMap": true,
     "moduleResolution": "node",
     "sourceMap": true,
+    "strict": true,
     "module": "commonjs",
     "target": "es2019"
   },

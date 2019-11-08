@@ -1,7 +1,7 @@
 import path from 'path';
 import {promisify} from 'util';
 
-import {assemble, Chunkset} from 'asset-assembler';
+import {assemble, Chunkset, ContentType} from 'asset-assembler';
 import jsdom from 'jsdom';
 import {Volume} from 'memfs';
 import webpack from 'webpack';
@@ -13,18 +13,18 @@ class ChunksetResourceLoader extends jsdom.ResourceLoader {
     super();
   }
 
-  fetch(url, options) {
+  async fetch(url: string, options: any) {
     const staticPrefx = 'https://example.com/static/';
     if (url.startsWith(staticPrefx)) {
       const [chunkName, extension] = url.substr(staticPrefx.length).split('.');
       if (extension !== 'js') {
         return Promise.reject(new Error(`Unsupported batch type ${url}`));
       }
-      return Promise.resolve(assemble(this.chunkset, {
+      return Buffer.from(assemble(this.chunkset, {
         chunkIds: [],
         chunkNames: [chunkName],
         includeDeps: true,
-        contentType: extension,
+        contentType: extension as ContentType,
       }));
     }
 
@@ -39,12 +39,12 @@ class ChunksetResourceLoader extends jsdom.ResourceLoader {
         chunkIds: ids,
         chunkNames: [],
         includeDeps: false,
-        contentType: extension,
+        contentType: extension as ContentType,
       };
-      return Promise.resolve(assemble(this.chunkset, options));
+      return Buffer.from(assemble(this.chunkset, options));
     }
 
-    return Promise.reject(new Error(`Cannot fetch ${url}`));
+    throw new Error(`Cannot fetch ${url}`);
   }
 }
 
@@ -110,7 +110,7 @@ Promise.all([import("./c-src"), import("./d-src")]).then(() => {
 
     const logs: string[] = [];
     const virtualConsole = new jsdom.VirtualConsole();
-    virtualConsole.on('log', (message) => {
+    virtualConsole.on('log', (message: string) => {
       logs.push(message);
     });
 
@@ -124,8 +124,8 @@ Promise.all([import("./c-src"), import("./d-src")]).then(() => {
       }
     );
     await new Promise((resolve, reject) => {
-      dom.window.onCodeExecuted = resolve;
-      dom.window.document.getElementById('entrypoint').addEventListener('error', (e) => {
+      (dom.window as any).onCodeExecuted = resolve;
+      dom.window.document.getElementById('entrypoint')!.addEventListener('error', (e: any) => {
         reject(e.error || new Error(e.message));
       });
       dom.window.onerror = reject;

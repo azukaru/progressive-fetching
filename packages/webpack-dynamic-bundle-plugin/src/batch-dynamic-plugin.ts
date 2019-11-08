@@ -24,10 +24,8 @@ function loadingEnded4() {
 
 /**
  * In webpack 5, the hook moved from the mainTemplate to its own plugin.
- *
- * @param {webpack.compilation.Compilation} compilation
  */
-function getWebpackJsonpHook(compilation) {
+function getWebpackJsonpHook(compilation: webpack.compilation.Compilation) {
   const {mainTemplate} = compilation;
 
   // @ts-ignore
@@ -51,13 +49,10 @@ export default class DynamicBundlePlugin {
   constructor(private buildBatchEndpoint: (prefix: string, ids: number[]) => string) {
   }
 
-  /**
-   * @param {webpack.Compiler} compiler
-   */
-  apply(compiler) {
+  apply(compiler: webpack.Compiler) {
     compiler.hooks.compilation.tap(DynamicBundlePlugin.name, (compilation) => {
       let jsonpScriptHook = getWebpackJsonpHook(compilation);
-      jsonpScriptHook.tap(DynamicBundlePlugin.name, (src, chunk, hash) => {
+      jsonpScriptHook.tap(DynamicBundlePlugin.name, () => {
         const {
           crossOriginLoading,
           chunkLoadTimeout,

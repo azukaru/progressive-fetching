@@ -28,15 +28,19 @@ export interface Chunkset {
   chunks: Chunk[];
 }
 
-function* collectParts(chunkset: Chunkset, options: AssemblyOptions): Generator<Part> {
+function* collectParts(chunkset: Chunkset, options: AssemblyOptions): Generator<Part, void, undefined> {
   const {includeDeps} = options;
   const indices = options.chunkIds.concat(options.chunkNames.map(name => {
-    return chunkset.names.get(name);
+    const resolvedIndex = chunkset.names.get(name);
+    if (resolvedIndex === undefined) {
+      throw new Error(`Invalid chunk name ${name}`);
+    }
+    return resolvedIndex;
   }));
 
   const visited: Set<number> = new Set();
 
-  function* visitChunk(index: number) {
+  function* visitChunk(index: number): Generator<Part, void, undefined> {
     if (visited.has(index)) return;
     visited.add(index);
 

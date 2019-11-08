@@ -15,6 +15,7 @@
     "asset-assembler": "^0.0.0-pre.12"
   },
   "devDependencies": {
+    "@types/jsdom": "^12.2.4",
     "canvas": "^2.6.0",
     "jsdom": "^15.2.1",
     "memfs": "^2.16.1",

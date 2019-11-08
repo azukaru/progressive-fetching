@@ -1,9 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-import {assemble, AssemblyOptions, Chunkset, ContentType} from 'asset-assembler';
+import {assemble, AssemblyOptions, Chunkset, ContentType, Chunk} from 'asset-assembler';
+import {ServerResponse} from 'http';
 
-function loadJSON(...segments) {
+function loadJSON(...segments: string[]) {
   return JSON.parse(fs.readFileSync(path.resolve(...segments), 'utf8'));
 }
 
@@ -16,12 +17,12 @@ function loadChunkset(): Chunkset {
   }
   const manifest = loadJSON('.next', 'build-manifest.json');
 
-  const chunks = [];
+  const chunks: Chunk[] = [];
   const names = new Map();
 
   const filenameToChunkId = new Map();
 
-  function getChunkIdForFilename(filename) {
+  function getChunkIdForFilename(filename: string) {
     if (filenameToChunkId.has(filename)) {
       return filenameToChunkId.get(filename);
     }
@@ -75,21 +76,21 @@ function loadChunkset(): Chunkset {
   };
 }
 
-function parseChunkIds(chunkIds) {
+function parseChunkIds(chunkIds: string) {
   if (!chunkIds || typeof chunkIds !== 'string') {
     return [];
   }
   return chunkIds.split(',').map(id => parseInt(id, 10));
 }
 
-function parseChunkNames(chunkNames) {
+function parseChunkNames(chunkNames: string) {
   if (!chunkNames || typeof chunkNames !== 'string') {
     return [];
   }
   return chunkNames.split(',');
 }
 
-function parseAssemblyOptions(arg) {
+function parseAssemblyOptions(arg: string) {
   const options: AssemblyOptions = {
     chunkIds: [],
     chunkNames: [],
@@ -114,7 +115,7 @@ function parseAssemblyOptions(arg) {
   return options;
 }
 
-export default (req, res) => {
+export default (req: any, res: ServerResponse) => {
   if (req.query.chunkIds.endsWith('.js.map')) {
     res.setHeader('Content-Type', 'application/json');
     res.end(Buffer.from('{}'));

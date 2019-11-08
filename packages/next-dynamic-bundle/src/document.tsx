@@ -3,14 +3,14 @@ import Document, {Html, Head, Main, NextScript} from 'next/document';
 // @ts-ignore
 import React from 'react';
 
-function toChunkNames(props) {
+function toChunkNames(props: any) {
   const {page} = props.__NEXT_DATA__;
   return ['_app', page.replace(/^\//, '')]
     .map(name => encodeURIComponent(name))
     .join(',');
 }
 
-function HackyNextScript(props) {
+function HackyNextScript(props: any) {
   return <>
     <script
       id="__NEXT_DATA__"

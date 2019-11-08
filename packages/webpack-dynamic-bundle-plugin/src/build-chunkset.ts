@@ -10,8 +10,7 @@ export function buildChunksetFromCompilation(fs: webpack.InputFileSystem,
   const names = new Map<string, number>();
   const chunkMapping = new Map<any, Chunk>();
 
-  /** @type {Chunk[]} */
-  const chunks = [];
+  const chunks: Chunk[] = [];
 
   const sortedChunks = [
     ...(compilation.chunks as webpack.compilation.Chunk[])
@@ -60,9 +59,9 @@ export function buildChunksetFromCompilation(fs: webpack.InputFileSystem,
       throw new Error('Unexpected chunk name, should match entrypoint');
     }
 
-    const chunk = chunkMapping.get(entryChunk);
+    const chunk = chunkMapping.get(entryChunk)!;
     for (const depChunk of depChunks) {
-      const chunkIdx = chunks.indexOf(chunkMapping.get(depChunk));
+      const chunkIdx = chunks.indexOf(chunkMapping.get(depChunk)!);
       chunk.parts[0].dependsOn.push(chunkIdx);
     }
   }

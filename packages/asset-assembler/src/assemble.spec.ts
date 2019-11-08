@@ -36,7 +36,7 @@ describe('assemble', () => {
         const chunksPath = path.join(exampleSetPath, 'chunks');
         for (const chunkFile of fs.readdirSync(chunksPath)) {
           const chunkData = fs.readFileSync(path.join(chunksPath, chunkFile));
-          const [, chunkId, chunkName] = chunkFile.match(/^(\d+)-([^.]+)\.(\w+)$/);
+          const [, chunkId, chunkName] = chunkFile.match(/^(\d+)-([^.]+)\.(\w+)$/) ?? [];
           const id = parseInt(chunkId, 10);
           exampleSet.chunks[id] = {
             name: chunkName,
@@ -62,7 +62,7 @@ describe('assemble', () => {
             {
               chunkIds: [],
               chunkNames: [],
-              contentType: path.extname(exampleAssetName).slice(1),
+              contentType: path.extname(exampleAssetName).slice(1) as ContentType,
               includeDeps: true,
             },
             JSON.parse(testCase.slice(2, newlineIdx))

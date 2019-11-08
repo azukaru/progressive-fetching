@@ -1,11 +1,12 @@
 import {DynamicBundlePlugin} from 'webpack-dynamic-bundle-plugin';
+import webpack = require('webpack');
 
 export {default as handler, config as handlerConfig} from './handler';
 
 export {default as Document} from './document';
 
 interface NextConfig {
-  webpack?(config: any, options: any);
+  webpack?(config: any, options: any): void;
 }
 
 interface DynamicBundleOptions {
@@ -19,12 +20,12 @@ export function withDynamicBundle({prefix}: DynamicBundleOptions) {
 
   return function applyDynamicBundle(nextConfig: NextConfig = {}) {
     return Object.assign({}, nextConfig, {
-      webpack(config, options) {
+      webpack(config: webpack.Configuration, options: any) {
         const {dev, isServer} = options;
 
         // TODO: Handle DLL plugin when building either the chunk list or the deps
         // inside of the chunkset.
-        config.plugins = config.plugins.filter(plugin => {
+        config.plugins = (config.plugins || []).filter(plugin => {
           const {name} = plugin.constructor;
           return name !== 'AutoDLLPlugin';
         });
@@ -44,6 +45,10 @@ export function withDynamicBundle({prefix}: DynamicBundleOptions) {
           config.plugins.push(new DynamicBundlePlugin(
             buildChunkUrl as (prefix: string, ids: number[]) => string
           ));
+
+          if (!config.output) {
+            config.output = {};
+          }
 
           if (dev) {
             config.output.chunkFilename = 'static/chunks/[id].js';
