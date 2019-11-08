@@ -1,5 +1,7 @@
-import path from 'path';
-import { makeFinegrained } from '../assembler/webpack';
+'use strict';
+
+const path = require('path');
+
 const config = {
     context: __dirname,
     entry: {
@@ -18,4 +20,4 @@ const config = {
         contentBase: path.resolve(__dirname, 'static'),
     },
 };
-export default makeFinegrained(config);
+module.exports = config;

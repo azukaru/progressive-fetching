@@ -2,23 +2,8 @@ import {start as startREPL, REPLServer} from 'repl';
 import {createServer, IncomingMessage, ServerResponse, Server} from 'http';
 import {AddressInfo} from 'net';
 import {format} from 'util';
-import {spawn, ChildProcess} from 'child_process';
-import {clearLine, cursorTo} from 'readline';
 
-function printHelloABunch() {
-  process.on('disconnect', () => process.exit());
-  if (!process.connected) {process.exit();}
-  setInterval(() => {console.log('hello')}, 500);
-}
-
-const hello = spawn(
-  'node',
-  ['-e', `(${printHelloABunch})()`],
-  {
-    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-  }
-);
-hello;
+import WebpackBuilder from './webpack';
 
 class Webl {
   onRequest = this._onRequest.bind(this);
@@ -27,13 +12,14 @@ class Webl {
   private mode: 'development' | 'test' | 'production';
   private port: number | null = null;
   private progress: number = 0;
+  private builder: WebpackBuilder;
 
   constructor(private repl: REPLServer) {
     this.mode = process.env.NODE_ENV as 'production' || 'development';
     this.registerCommands();
     this.updatePrompt();
 
-    this.forwardOutput('hello', hello);
+    this.builder = new WebpackBuilder({repl, setProgress: this.setProgress.bind(this)});
   }
 
   private registerCommands() {
@@ -45,27 +31,8 @@ class Webl {
     });
   }
 
-  forwardOutput(name: string, child: ChildProcess) {
-    for (const stream of [child.stdout, child.stderr]) {
-      if (!stream) continue;
-      stream.setEncoding('utf8');
-      stream.on('data', data => {
-        clearLine(this.repl.outputStream, -1);
-        cursorTo(this.repl.outputStream, 0);
-        const lines = data.split('\n');
-        if (!lines[lines.length - 1]) {
-          lines.pop();
-        }
-        for (const line of lines) {
-          this.repl.outputStream.write(`< ${name}: ${line}\n`);
-        }
-        this.updatePrompt();
-      });
-    }
-  }
-
-  setProgress(percent: number) {
-    this.progress = percent;
+  setProgress(progress: number) {
+    this.progress = progress;
     this.updatePrompt();
   }
 
@@ -79,7 +46,8 @@ class Webl {
       return `⏱>`;
     }
     const mode = this.mode === 'production' ? '✨' : '🛠';
-    const perc = this.progress < 10 ? `0${this.progress}` : (this.progress === 100 ? '✅' : `${this.progress}`);
+    const rounded = Math.floor(this.progress * 100);
+    const perc = rounded < 10 ? `0${rounded}` : (rounded === 100 ? '✅' : `${rounded}`);
     return `[${mode} ${perc}] `;
   }
 
@@ -101,14 +69,6 @@ class Webl {
   private _onListen(server: Server) {
     this.port = (server.address() as AddressInfo).port;
     this.updatePrompt();
-
-    const bumpProgress = () => {
-      if (this.progress < 100) {
-        this.setProgress(this.progress + 10);
-        setTimeout(bumpProgress, 200);
-      }
-    };
-    bumpProgress();
   }
 }
 

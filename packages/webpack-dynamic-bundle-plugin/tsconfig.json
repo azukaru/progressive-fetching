@@ -8,7 +8,7 @@
     { "path": "../asset-assembler" }
   ],
   "include": [
-    "./src"
+    "./src/**/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts"
