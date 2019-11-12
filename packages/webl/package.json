@@ -6,6 +6,7 @@
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
   "typings": "./dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],

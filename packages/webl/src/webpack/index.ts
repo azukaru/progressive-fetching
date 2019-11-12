@@ -1,6 +1,7 @@
 import {fork, ChildProcess} from 'child_process';
 import {clearLine, cursorTo} from 'readline';
 import {REPLServer} from 'repl';
+import {fileURLToPath} from 'url';
 
 function forwardOutput(worker: ChildProcess, repl: REPLServer) {
   const output = repl.outputStream;
@@ -31,7 +32,8 @@ export default class WebpackBuilder {
   private worker: ChildProcess;
 
   constructor(options: BuilderOptions) {
-    this.worker = fork(require.resolve('./worker'), [], {
+    const workerURL = new URL('./worker.js', import.meta.url);
+    this.worker = fork(fileURLToPath(workerURL.href), [], {
       stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
     });
     this.worker.unref();

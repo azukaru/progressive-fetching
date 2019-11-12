@@ -3,7 +3,7 @@ import {createServer, IncomingMessage, ServerResponse, Server} from 'http';
 import {AddressInfo} from 'net';
 import {format} from 'util';
 
-import WebpackBuilder from './webpack';
+import WebpackBuilder from './webpack/index.js';
 
 class Webl {
   onRequest = this._onRequest.bind(this);
