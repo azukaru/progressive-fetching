@@ -24,14 +24,24 @@ async function main() {
 
   const watcher = compiler.watch({
     poll: false,
-  }, (err, stats) => {
-    console.log('build completed', !!err, !!stats);
+  }, (err /*, stats */) => {
+    if (err) {
+      process.send!({
+        type: 'webl.builder.done',
+        success: false,
+        message: err.message,
+      });
+    } else {
+      process.send!({
+        type: 'webl.builder.done',
+        success: true,
+      });
+    }
   });
-
-  setTimeout(() => {
+  process.on('SIGTERM', () => {
     watcher.close(() => {
       process.exit();
     });
-  }, 10000);
+  });
 }
 main().catch(e => process.nextTick(() => {throw e;}));
