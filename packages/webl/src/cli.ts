@@ -3,7 +3,7 @@ import {createServer, IncomingMessage, ServerResponse, Server} from 'http';
 import {AddressInfo} from 'net';
 import {format} from 'util';
 
-import WebpackBuilder from './webpack/index.js';
+interface Builder {}
 
 class Webl {
   onRequest = this._onRequest.bind(this);
@@ -12,14 +12,12 @@ class Webl {
   private mode: 'development' | 'test' | 'production';
   private port: number | null = null;
   private progress: number = 0;
-  private builder: WebpackBuilder;
+  private builder?: Builder;
 
   constructor(private repl: REPLServer) {
     this.mode = process.env.NODE_ENV as 'production' || 'development';
     this.registerCommands();
     this.updatePrompt();
-
-    this.builder = new WebpackBuilder({repl, setProgress: this.setProgress.bind(this)});
   }
 
   private registerCommands() {
@@ -29,6 +27,11 @@ class Webl {
         this.log('Got text: %j', text);
       },
     });
+  }
+
+  async start() {
+    const {default: WebpackBuilder} = await import('./webpack/index.js');
+    this.builder = new WebpackBuilder({repl: this.repl, setProgress: this.setProgress.bind(this)});
   }
 
   setProgress(progress: number) {
@@ -79,6 +82,8 @@ async function main(argv: string[]) {
   const server = createServer(webl.onRequest);
   server.unref();
   server.listen(0, '127.0.0.1', webl.onListen.bind(null, server));
+
+  await webl.start();
 }
 
 main(process.argv).catch(e => process.nextTick(() => {throw e}));
