@@ -1,74 +1,51 @@
 import {start as startREPL, REPLServer} from 'repl';
 import {createServer, IncomingMessage, ServerResponse, Server} from 'http';
 import {AddressInfo} from 'net';
-import {format} from 'util';
 import {existsSync} from 'fs';
+import WeblREPL from './repl.js';
 
 interface Builder {}
+
+interface WeblOptions {
+  repl: boolean | REPLServer;
+}
 
 class Webl {
   onRequest = this._onRequest.bind(this);
   onListen = this._onListen.bind(this);
 
-  private mode: 'development' | 'test' | 'production';
-  private port: number | null = null;
-  private progress: number = 0;
   private builder?: Builder;
+  private repl: WeblREPL | null;
 
-  constructor(private repl: REPLServer) {
-    this.mode = process.env.NODE_ENV as 'production' || 'development';
-    this.registerCommands();
-    this.updatePrompt();
-  }
-
-  private registerCommands() {
-    this.repl.defineCommand('node-env', {
-      help: '',
-      action: (text) => {
-        this.log('Got text: %j', text);
-      },
-    });
+  constructor(options: WeblOptions) {
+    this.repl = options.repl ?
+      new WeblREPL(options.repl === true ? startREPL() : options.repl) : null;
   }
 
   async start() {
+    const forwardOutput = this.repl ?
+      this.repl.forwardOutput.bind(this.repl) : () => {};
+    const setProgress = this.repl ?
+      this.repl.setProgress.bind(this.repl) : () => {};
     if (existsSync('webpack.config.js')) {
       const {default: WebpackBuilder} = await import('./webpack/index.js');
-      this.builder = new WebpackBuilder({repl: this.repl, setProgress: this.setProgress.bind(this)});
+      this.builder = new WebpackBuilder({
+        forwardOutput,
+        setProgress,
+      });
     } else {
       const {default: ParcelBuilder} = await import('./parcel/index.js');
-      this.builder = new ParcelBuilder({repl: this.repl, setProgress: this.setProgress.bind(this)});
+      this.builder = new ParcelBuilder({
+        forwardOutput,
+        setProgress,
+      });
     }
-  }
-
-  setProgress(progress: number) {
-    this.progress = progress;
-    this.updatePrompt();
-  }
-
-  log(message: any, ...args: any[]) {
-    this.repl.outputStream.write(format(message, ...args) + '\n');
-    this.updatePrompt();
-  }
-
-  formatPrompt() {
-    if (this.port === null) {
-      return `⏱>`;
-    }
-    const mode = this.mode === 'production' ? '✨' : '🛠';
-    const rounded = Math.floor(this.progress * 100);
-    const perc = rounded < 10 ? ` ${rounded}%` : (rounded === 100 ? ' ✅' : `${rounded}%`);
-    return `[${mode} ${perc}] `;
-  }
-
-  updatePrompt() {
-    this.repl.setPrompt(this.formatPrompt());
-    this.repl.prompt(true);
   }
 
   exitOnClose() {
-    this.repl.on('close', () => {
-      process.exit();
-    });
+    if (this.repl) {
+      this.repl.exitOnClose();
+    }
   }
 
   private _onRequest(req: IncomingMessage, res: ServerResponse) {
@@ -76,13 +53,14 @@ class Webl {
   }
 
   private _onListen(server: Server) {
-    this.port = (server.address() as AddressInfo).port;
-    this.updatePrompt();
+    this.repl?.setPort((server.address() as AddressInfo).port);
   }
 }
 
 async function main(argv: string[]) {
-  const webl = new Webl(startREPL());
+  const webl = new Webl({
+    repl: process.stdin.isTTY,
+  });
   webl.exitOnClose();
 
   const server = createServer(webl.onRequest);
