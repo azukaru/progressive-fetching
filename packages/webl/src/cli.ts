@@ -56,7 +56,7 @@ class Webl {
     }
     const mode = this.mode === 'production' ? '✨' : '🛠';
     const rounded = Math.floor(this.progress * 100);
-    const perc = rounded < 10 ? `0${rounded}` : (rounded === 100 ? '✅' : `${rounded}`);
+    const perc = rounded < 10 ? ` ${rounded}%` : (rounded === 100 ? ' ✅' : `${rounded}%`);
     return `[${mode} ${perc}] `;
   }
 
