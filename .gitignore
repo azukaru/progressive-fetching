@@ -7,4 +7,6 @@
 /packages/*/node_modules
 /packages/*/dist
 
+.parcel-cache
+
 *.tsbuildinfo

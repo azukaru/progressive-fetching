@@ -7,41 +7,62 @@ if (process.connected !== true) {
 
 import path from 'path';
 
-import parcel from 'parcel';
+import parcel from '@parcel/core';
+import ParcelPkg from '@parcel/package-manager';
+import ParcelFS from '@parcel/fs';
+import {fileURLToPath} from 'url';
+
+const {NodePackageManager} = ParcelPkg;
+const {NodeFS} = ParcelFS;
+
+// @ts-ignore
+const Bundler: typeof parcel = parcel.default || parcel;
+
+interface ParcelConfigFile {}
+
+interface BuildEvent {}
 
 async function main() {
-  // const {default: config} = await import(path.resolve('webpack.config.js'));
+  const FILENAME = fileURLToPath(import.meta.url);
+  // HACK: Parcel doesn't have a great way to statically determine what the
+  //       entrypoints are supposed to be.
+  const entries = path.resolve('app/page-*.js');
+  const packageManager = new NodePackageManager(new NodeFS());
+  let defaultConfig: ParcelConfigFile = await packageManager.require(
+    '@parcel/config-default',
+    FILENAME
+  );
 
-  // const compiler = webpack(config);
+  const options = {
+    entries,
+    packageManager,
+    defaultConfig: {
+      ...defaultConfig,
+      filePath: (await packageManager.resolve(
+        '@parcel/config-default',
+        FILENAME
+      )).resolved
+    },
+    watch: true,
+    autoInstall: false,
+  };
+  const bundler = new Bundler(options);
 
-  // new webpack.ProgressPlugin((progress: number, message: string, moduleProgress?: string, activeModules?: string, moduleName?: string) => {
-  //   process.send!({
-  //     type: 'webl.builder.progress',
-  //     progress,
-  //     message,
-  //   });
-  // }).apply(compiler);
+  process.send!({
+    type: 'webl.builder.progress',
+    progress: 0,
+  });
 
-  // const watcher = compiler.watch({
-  //   poll: false,
-  // }, (err /*, stats */) => {
-  //   if (err) {
-  //     process.send!({
-  //       type: 'webl.builder.done',
-  //       success: false,
-  //       message: err.message,
-  //     });
-  //   } else {
-  //     process.send!({
-  //       type: 'webl.builder.done',
-  //       success: true,
-  //     });
-  //   }
-  // });
-  // process.on('SIGTERM', () => {
-  //   watcher.close(() => {
-  //     process.exit();
-  //   });
-  // });
+  bundler.watch((error: Error | null, buildEvent: BuildEvent) => {
+    process.send!({
+      type: 'webl.builder.progress',
+      progress: 1,
+    });
+    process.send!({
+      type: 'webl.builder.done',
+      success: !error,
+      message: error?.message,
+    });
+  });
 }
 main().catch(e => process.nextTick(() => {throw e;}));

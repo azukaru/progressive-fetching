@@ -2,6 +2,7 @@ import {start as startREPL, REPLServer} from 'repl';
 import {createServer, IncomingMessage, ServerResponse, Server} from 'http';
 import {AddressInfo} from 'net';
 import {format} from 'util';
+import {existsSync} from 'fs';
 
 interface Builder {}
 
@@ -30,8 +31,13 @@ class Webl {
   }
 
   async start() {
-    const {default: WebpackBuilder} = await import('./webpack/index.js');
-    this.builder = new WebpackBuilder({repl: this.repl, setProgress: this.setProgress.bind(this)});
+    if (existsSync('webpack.config.js')) {
+      const {default: WebpackBuilder} = await import('./webpack/index.js');
+      this.builder = new WebpackBuilder({repl: this.repl, setProgress: this.setProgress.bind(this)});
+    } else {
+      const {default: ParcelBuilder} = await import('./parcel/index.js');
+      this.builder = new ParcelBuilder({repl: this.repl, setProgress: this.setProgress.bind(this)});
+    }
   }
 
   setProgress(progress: number) {
