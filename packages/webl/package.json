@@ -1,6 +1,6 @@
 {
   "name": "webl",
-  "version": "0.0.0-pre.12",
+  "version": "0.0.0-pre.13",
   "description": "A REPL for web apps",
   "license": "Apache-2.0",
   "main": "./dist/index.js",
