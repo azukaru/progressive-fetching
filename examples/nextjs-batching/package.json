@@ -1,8 +1,13 @@
 {
   "name": "nextjs-batching",
+  "version": "0.0.0",
+  "private": true,
   "dependencies": {
-    "asset-assembler": "../../packages/asset-assembler/pkg",
-    "next-dynamic-bundle": "../../packages/next-dynamic-bundle/pkg",
-    "webpack-dynamic-bundle-plugin": "../../packages/webpack-dynamic-bundle-plugin/pkg"
+    "next": "^9.1.4",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "asset-assembler": "^0.0.0-pre.12",
+    "next-dynamic-bundle": "^0.0.0-pre.12",
+    "webpack-dynamic-bundle-plugin": "^0.0.0-pre.12"
   }
 }

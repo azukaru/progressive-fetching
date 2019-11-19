@@ -3,12 +3,12 @@
   "compilerOptions": {
     "jsx": "react",
     "types": ["react"],
-    "composite": true,
     "rootDir": "./src",
     "outDir": "./dist"
   },
   "include": [
-    "./src/**/*.{ts,tsx}"
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
   ],
   "exclude": [
     "**/*.spec.ts"

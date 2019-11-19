@@ -1,6 +1,8 @@
 import {DynamicBundlePlugin} from 'webpack-dynamic-bundle-plugin';
 import webpack = require('webpack');
 
+// Need to use require for proper tracing
+const RequestHandler = require('./handler');
 export {default as handler, config as handlerConfig} from './handler';
 
 export {default as Document} from './document';

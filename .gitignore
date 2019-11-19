@@ -1,6 +1,7 @@
 /node_modules
 /npm-debug.log
 /.vscode
+/yarn-error.log
 
 /examples/*/node_modules
 

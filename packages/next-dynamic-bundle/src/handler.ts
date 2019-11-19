@@ -1,21 +1,23 @@
-import fs from 'fs';
-import path from 'path';
+// Need to use require so it works with the node file tracer
+const fs = require('fs');
+const path = require('path');
 
 import {assemble, AssemblyOptions, Chunkset, ContentType, Chunk} from 'asset-assembler';
 import {ServerResponse} from 'http';
 
-function loadJSON(...segments: string[]) {
-  return JSON.parse(fs.readFileSync(path.resolve(...segments), 'utf8'));
-}
-
 function loadChunkset(): Chunkset {
+  const chunkDir = path.resolve('.next', 'static', 'chunks');
   let buildId = 'development';
   try {
-    buildId = fs.readFileSync(path.resolve('.next', 'BUILD_ID'), 'utf8');
+    buildId = fs.readFileSync(path.resolve('.next/BUILD_ID'), 'utf8');
   } catch (e) {
     if (e.code !== 'ENOENT') throw e;
   }
-  const manifest = loadJSON('.next', 'build-manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(path.resolve('.next/build-manifest.json'), 'utf8'));
+
+  // stat directories we need to preserve, for node file tracing purposes
+  fs.statSync(path.resolve(`.next/static/${buildId}/pages`));
+  fs.statSync(chunkDir);
 
   const chunks: Chunk[] = [];
   const names = new Map();
@@ -46,8 +48,7 @@ function loadChunkset(): Chunkset {
     return chunkId;
   }
 
-  const chunkDir = path.resolve('.next', 'static', 'chunks');
-  const numberedChunks = fs.readdirSync(chunkDir).filter(filename => filename.endsWith('.js'));
+  const numberedChunks: string[] = fs.readdirSync(chunkDir).filter((filename: string) => filename.endsWith('.js'));
   numberedChunks.sort((a, b) => {
     return parseInt(a.substr(0, a.indexOf('.')), 10) - parseInt(b.substr(0, b.indexOf('.')), 10);
   });

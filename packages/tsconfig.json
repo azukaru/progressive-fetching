@@ -4,6 +4,7 @@
     { "path": "asset-assembler" },
     { "path": "next-dynamic-bundle" },
     { "path": "now-next-dynamic-bundle" },
+    { "path": "webl" },
     { "path": "webpack-dynamic-bundle-plugin" }
   ]
 }

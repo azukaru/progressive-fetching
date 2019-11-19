@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "next": "^9.1.2",
-    "react": "^16.11.0"
+    "react": "^16.11.0",
+    "typescript": "^3.7.2"
   },
   "publishConfig": {
     "registry": "https://wombat-dressing-room.appspot.com"
