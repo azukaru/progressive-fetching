@@ -1,6 +1,6 @@
 {
   "name": "next-dynamic-bundle",
-  "version": "0.0.0-pre.13",
+  "version": "0.0.0-pre.14",
   "description": "Enable dynamic bundle for next",
   "author": "Google",
   "homepage": "https://github.com/azukaru/progressive-fetching/tree/master/packages/next-dynamic-bundle#readme",
