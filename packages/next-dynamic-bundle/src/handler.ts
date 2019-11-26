@@ -96,7 +96,7 @@ function parseAssemblyOptions(arg: string) {
     chunkIds: [],
     chunkNames: [],
     contentType: ContentType.JS_SCRIPT,
-    includeDeps: true,
+    includeDeps: false,
   };
 
   const [key, value] = arg.split('=');

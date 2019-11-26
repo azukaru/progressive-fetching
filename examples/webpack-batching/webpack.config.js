@@ -14,10 +14,20 @@ const config = {
     },
     optimization: {
         // Optionally, set runtime chunk.
-        runtimeChunk: 'single',
+        // runtimeChunk: 'single',
     },
     devServer: {
         contentBase: path.resolve(__dirname, 'static'),
+        hot: true,
+        overlay: true,
+    },
+    module: {
+      rules: [
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
+        },
+      ],
     },
 };
 module.exports = config;
