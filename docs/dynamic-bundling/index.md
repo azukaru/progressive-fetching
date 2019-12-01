@@ -23,6 +23,7 @@ This general idea has been implemented to varying degrees by different companies
 * **Module Set Serving** (“MSS”, Google), used by Google Search, GMail and other Google properties.
 * `ResourceLoader` (Wikimedia, [source][ResourceLoader-blog]), used to bundle code on wikipedia.com.
 * YUI (Yahoo) defines an optional [ComboHandler to fetch YUI-style modules][YUI-ComboHandler] (HT [@lawnsea][lawnsea]).
+* Progressive Bundling: Used by [begin.com](https://slides.begin.com/).
 * Honorable mentions for some generic JavaScript CDNs:
   * [`packd-es`][packd-es] (\<div>riots, [source][packd-es-source]),
     used by webcomponents.dev and is the only entry on this list that combines ES modules.
