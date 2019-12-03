@@ -1,0 +1,10 @@
+/node_modules
+/npm-debug.log
+/yarn-error.log
+
+/packages/*/node_modules
+/packages/*/dist
+
+.parcel-cache
+*.tsbuildinfo
+.vscode

@@ -1,0 +1,33 @@
+{
+  "name": "@progressive-fetching/webpack-batching",
+  "description": "Tracking work on progressive fetching",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/jest": "^24.0.21",
+    "@types/node": "^12.11.2",
+    "jest": "^24.9.0",
+    "lerna": "^3.18.3",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.0"
+  },
+  "dependencies": {},
+  "scripts": {
+    "publish-all": "lerna publish",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azukaru/progressive-fetching.git"
+  },
+  "keywords": [],
+  "author": "Google",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/azukaru/progressive-fetching/issues"
+  },
+  "homepage": "https://github.com/azukaru/progressive-fetching#readme"
+}
