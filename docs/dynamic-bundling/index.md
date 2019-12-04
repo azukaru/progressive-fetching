@@ -78,7 +78,7 @@ the API:
 * A combined version for the overall chunk set and no versioning of individual
   chunks.
 
-Some of these choices (e.g. excludes, combined version) are a based on the
+Some of these choices (e.g. excludes, combined version) are based on the
 observation that giving the client full knowledge of the chunk graph gets less
 practical as the size of the graph expands. It is further complicated by
 customized assets where chunk dependencies may vary between different
@@ -90,10 +90,17 @@ variants/users. See: The client cache manifest problem.
 
 In the presence of user preferences, themes, feature flags, and experiments,
 it can be impractical to render every possible combination of minor variations
-in the assets ahead of time. The easy solution is to include all variations
-regardless of how applicable they are to the current user. Runtime conditionals
-are then used to activate the parts of the returned code that is actually
-needed. This is wasteful in regards to network transfer and parse/execute times
+in the assets ahead of time:
+With 10 independent feature flags, a megabyte of assets sent to each user
+requires generating a gigabyte of assets when each possible combination is
+generated at build time.
+And it gets worse from there.
+
+The easy solution is to include all variations regardless of how applicable they
+are to the current user.
+Runtime conditionals are then used to activate the parts of the returned code
+that is actually needed.
+This is wasteful in regards to network transfer and parse/execute times
 and it also risks exposing experimental features.
 
 A better solution only includes code that applies to the current user.
