@@ -1,11 +1,41 @@
-'use strict';
+/*
+Copyright 2019 Google LLC
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/**
+ * @fileoverview An implementation of dynamically assembling assets from a set
+ * of chunks and a chunk dependency graph. The main input data structures are:
+ *
+ * - `Chunkset`: Describes the chunk contents and their relationship.
+ * - `AssemblyOptions`: A "query" against the chunkset that determines which
+ *                      chunks are rendered and how.
+ */
+
+/**
+ * Used to properly encode chunk data and set content-type headers.
+ */
 export enum ContentType {
   JS_SCRIPT = 'js',
   JS_MODULE = 'mjs',
   STYLESHEET = 'css',
 }
 
+/**
+ * Options for assembling assets from a chunkset. These would typically be
+ * extracted from URL parameters or from CLI flags.
+ */
 export interface AssemblyOptions {
   chunkIds: number[];
   chunkNames: string[];
@@ -13,16 +43,27 @@ export interface AssemblyOptions {
   includeDeps: boolean;
 }
 
+/**
+ * A part or fragment of a chunk that may be conditionally included.
+ */
 export interface Part {
   getBody(): Uint8Array;
   dependsOn: number[];
 }
 
+/**
+ * A chunk is a loadable unit of code. Each chunk consists of `Part`s, zero or
+ * more of which may actually be rendered for an individual request.
+ */
 export interface Chunk {
   name?: string;
   parts: Part[];
 }
 
+/**
+ * The top-level data structure that represents both the contents of all chunks
+ * and meta data about the chunks and their relationship.
+ */
 export interface Chunkset {
   names: Map<string, number>;
   chunks: Chunk[];
@@ -81,6 +122,10 @@ function concatArrays(arrays: Uint8Array[]): Uint8Array {
   return out;
 }
 
+/**
+ * Extracts chunk part contents from the given `chunkset` and renders them
+ * into a full asset, according to the  `options`.
+ */
 export function assemble(chunkset: Chunkset, options: AssemblyOptions): Uint8Array {
   const js: Uint8Array[] = [];
 
