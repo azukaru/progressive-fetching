@@ -1,0 +1,38 @@
+{
+  "name": "webpack-dynamic-bundle-plugin",
+  "version": "0.0.0-pre.13",
+  "description": "Batches many asset requests into one",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "tsc -b ."
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "asset-assembler": "^0.0.0-pre.13"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^12.2.4",
+    "@types/webpack": "^4.41.0",
+    "jsdom": "^15.2.1",
+    "memfs": "^2.16.1",
+    "typescript": "^3.7.0",
+    "webpack": "^4.41.2"
+  },
+  "publishConfig": {
+    "registry": "https://wombat-dressing-room.appspot.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azukaru/progressive-fetching.git"
+  },
+  "keywords": [],
+  "author": "Google",
+  "bugs": {
+    "url": "https://github.com/azukaru/progressive-fetching/issues"
+  },
+  "homepage": "https://github.com/azukaru/progressive-fetching#readme"
+}

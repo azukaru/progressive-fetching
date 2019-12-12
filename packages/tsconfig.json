@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "asset-assembler" }
+    { "path": "./asset-assembler" },
+    { "path": "./webpack-dynamic-bundle-plugin" }
   ]
 }
