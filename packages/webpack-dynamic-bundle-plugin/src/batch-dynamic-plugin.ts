@@ -15,9 +15,9 @@ limitations under the License.
 */
 
 import webpack from 'webpack';
-import {SyncWaterfallHook} from 'tapable';
+import { SyncWaterfallHook } from 'tapable';
 
-const {Template} = webpack;
+const { Template } = webpack;
 
 /**
  * Webpack Plugin to batch dynamic chunk loading requests.
@@ -40,151 +40,187 @@ export default class DynamicBundlePlugin {
    * @param buildBatchEndpoint Helper to construct an asset URL from a serving
    *                           prefix and a list of chunks ids.
    */
-  constructor(private buildBatchEndpoint: (prefix: string, ids: number[]) => string) {
-  }
+  constructor(
+    private buildBatchEndpoint: (prefix: string, ids: number[]) => string
+  ) {}
 
-  apply(compiler: webpack.Compiler) {
-    compiler.hooks.compilation.tap(DynamicBundlePlugin.name, (compilation: webpack.compilation.Compilation) => {
-      let jsonpScriptHook = getWebpackJsonpHook(compilation);
-      jsonpScriptHook.tap(DynamicBundlePlugin.name, () => {
-        const {
-          crossOriginLoading,
-          chunkLoadTimeout,
-          jsonpScriptType
-        } = compilation.outputOptions;
+  apply(compiler: webpack.Compiler): void {
+    compiler.hooks.compilation.tap(
+      DynamicBundlePlugin.name,
+      (compilation: webpack.compilation.Compilation) => {
+        const jsonpScriptHook = getWebpackJsonpHook(compilation);
+        jsonpScriptHook.tap(DynamicBundlePlugin.name, () => {
+          const {
+            crossOriginLoading,
+            chunkLoadTimeout,
+            jsonpScriptType,
+          } = compilation.outputOptions;
 
-        const requireFn = '__webpack_require__';
+          const requireFn = '__webpack_require__';
 
-        const scriptNonce = `${requireFn}.nc`;
-        const activeBatch = `${requireFn}._ab`;
-        const publicPath = `${requireFn}.p`;
+          const scriptNonce = `${requireFn}.nc`;
+          const activeBatch = `${requireFn}._ab`;
+          const publicPath = `${requireFn}.p`;
 
-        return Template.asString([
-          "var script;",
-          // DIFF: We create a batch entry and then have an if/else to either
-          // start a new batch or add it to an existing batch if one exists.
-          `var batchEntry = { id: chunkId, done: typeof loadingEnded === 'function' ? loadingEnded : ${loadingEnded4} };`,
-          `if (!${activeBatch}) {`,
-          Template.indent([
-            "script = document.createElement('script');",
-            "var batch = [batchEntry]",
-            `${activeBatch} = batch;`,
-            jsonpScriptType
-              ? `script.type = ${JSON.stringify(jsonpScriptType)};`
-              : "",
-            "script.charset = 'utf-8';",
-            `script.timeout = ${chunkLoadTimeout / 1000};`,
-            `if (${scriptNonce}) {`,
-            Template.indent(
-              `script.setAttribute("nonce", ${scriptNonce});`
-            ),
-            "}",
-            // DIFF: This delays the actual fetch by a microtick. In the original
-            // implementation of this hook, it's done immediately.
-            "Promise.resolve().then(function () {",
+          return Template.asString([
+            'var script;',
+            // DIFF: We create a batch entry and then have an if/else to either
+            // start a new batch or add it to an existing batch if one exists.
+            `var batchEntry = { id: chunkId, done: typeof loadingEnded === 'function' ? loadingEnded : ${loadingEnded4} };`,
+            `if (!${activeBatch}) {`,
             Template.indent([
-              `${activeBatch} = null;`,
-              // DIFF: In the original implementation, the script url is generated
-              // earlier and this is just `script.src = url;`.
-              `script.src = (${this.buildBatchEndpoint.toString()})(${publicPath}, batch.map(c => c.id));`,
-              crossOriginLoading
-                ? Template.asString([
-                  "if (script.src.indexOf(window.location.origin + '/') !== 0) {",
-                  Template.indent(
-                    `script.crossOrigin = ${JSON.stringify(crossOriginLoading)};`
-                  ),
-                  "}"
-                ])
-                : "",
-              "// create error before stack unwound to get useful stacktrace later",
-              "var error = new Error();",
-              "onScriptComplete = function (event) {",
+              "script = document.createElement('script');",
+              'var batch = [batchEntry]',
+              `${activeBatch} = batch;`,
+              jsonpScriptType
+                ? `script.type = ${JSON.stringify(jsonpScriptType)};`
+                : '',
+              "script.charset = 'utf-8';",
+              `script.timeout = ${chunkLoadTimeout / 1000};`,
+              `if (${scriptNonce}) {`,
+              Template.indent(`script.setAttribute("nonce", ${scriptNonce});`),
+              '}',
+              // DIFF: This delays the actual fetch by a microtick. In the original
+              // implementation of this hook, it's done immediately.
+              'Promise.resolve().then(function () {',
               Template.indent([
-                "// avoid mem leaks in IE.",
-                "script.onerror = script.onload = null;",
-                "clearTimeout(timeout);",
-                // DIFF: We have multiple chunks in the batch, so we have to iterate.
-                // Originally (in webpack 5), the `loadingEnded` function replaces
-                // `chunk.done()`. We capture those callbacks above.
-                "for (var batchIdx = 0; batchIdx < batch.length; ++batchIdx) {",
+                `${activeBatch} = null;`,
+                // DIFF: In the original implementation, the script url is generated
+                // earlier and this is just `script.src = url;`.
+                `script.src = (${this.buildBatchEndpoint.toString()})(${publicPath}, batch.map(c => c.id));`,
+                crossOriginLoading
+                  ? Template.asString([
+                      "if (script.src.indexOf(window.location.origin + '/') !== 0) {",
+                      Template.indent(
+                        `script.crossOrigin = ${JSON.stringify(
+                          crossOriginLoading
+                        )};`
+                      ),
+                      '}',
+                    ])
+                  : '',
+                '// create error before stack unwound to get useful stacktrace later',
+                'var error = new Error();',
+                'onScriptComplete = function (event) {',
                 Template.indent([
-                  "var chunk = batch[batchIdx];",
-                  "var reportError = chunk.done();",
-                  "if(reportError) {",
+                  '// avoid mem leaks in IE.',
+                  'script.onerror = script.onload = null;',
+                  'clearTimeout(timeout);',
+                  // DIFF: We have multiple chunks in the batch, so we have to iterate.
+                  // Originally (in webpack 5), the `loadingEnded` function replaces
+                  // `chunk.done()`. We capture those callbacks above.
+                  'for (var batchIdx = 0; batchIdx < batch.length; ++batchIdx) {',
                   Template.indent([
-                    "var errorType = event && (event.type === 'load' ? 'missing' : event.type);",
-                    "var realSrc = event && event.target && event.target.src;",
-                    "error.message = 'Loading chunk ' + chunk.id + ' failed.\\n(' + errorType + ': ' + realSrc + ')';",
-                    "error.name = 'ChunkLoadError';",
-                    "error.type = errorType;",
-                    "error.request = realSrc;",
-                    "reportError(error);"
+                    'var chunk = batch[batchIdx];',
+                    'var reportError = chunk.done();',
+                    'if(reportError) {',
+                    Template.indent([
+                      "var errorType = event && (event.type === 'load' ? 'missing' : event.type);",
+                      'var realSrc = event && event.target && event.target.src;',
+                      "error.message = 'Loading chunk ' + chunk.id + ' failed.\\n(' + errorType + ': ' + realSrc + ')';",
+                      "error.name = 'ChunkLoadError';",
+                      'error.type = errorType;',
+                      'error.request = realSrc;',
+                      'reportError(error);',
+                    ]),
+                    '}',
                   ]),
-                  "}",
+                  '}',
                 ]),
-                "}"
+                '};',
+                'var timeout = setTimeout(function(){',
+                Template.indent([
+                  "onScriptComplete({ type: 'timeout', target: script });",
+                ]),
+                `}, ${chunkLoadTimeout});`,
+                'script.onerror = script.onload = onScriptComplete;',
               ]),
-              "};",
-              "var timeout = setTimeout(function(){",
-              Template.indent([
-                "onScriptComplete({ type: 'timeout', target: script });"
-              ]),
-              `}, ${chunkLoadTimeout});`,
-              "script.onerror = script.onload = onScriptComplete;"
+              '});',
             ]),
-            "});"
-          ]),
-          `} else {`,
-          Template.indent([
-            // DIFF: The surrounding code assumes that this code always generates
-            // a local `script` variable that can be appended to the DOM. So even
-            // when we're adding to a batch, we need to generate some kind of DOM
-            // node. So we're adding comments. Also helps with debugging!
-            "var onScriptComplete;",
-            `${activeBatch}.push(batchEntry);`,
-            "script = document.createComment(' Chunk ' + chunkId + ' queued ');",
-          ]),
-          `}`,
-        ]);
-      });
-    });
+            `} else {`,
+            Template.indent([
+              // DIFF: The surrounding code assumes that this code always generates
+              // a local `script` variable that can be appended to the DOM. So even
+              // when we're adding to a batch, we need to generate some kind of DOM
+              // node. So we're adding comments. Also helps with debugging!
+              'var onScriptComplete;',
+              `${activeBatch}.push(batchEntry);`,
+              "script = document.createComment(' Chunk ' + chunkId + ' queued ');",
+            ]),
+            `}`,
+          ]);
+        });
+      }
+    );
   }
 }
+
+/**
+ * This is used within the webpack runtime to track the state of chunks.
+ *
+ * Should only be used within code meant to run within the webpack runtime.
+ */
+declare const installedChunks: (0 | undefined | [Error, unknown])[];
+
+/**
+ * This is used within the webpack runtime to store the requested chunk.
+ *
+ * Should only be used within code meant to run within the webpack runtime.
+ */
+declare const chunkId: number;
 
 /**
  * Simulate the chunk loaded callback in webpack 4. Could be dropped if we don't
  * care about working with webpack 4. This function is stringified and will run
  * in the browser. `installedChunks` comes from the scope it gets inserted into.
  */
-function loadingEnded4() {
-  var returnValue = null;
-  // @ts-ignore installedChunks is part of the scope this is inserted into
-  var chunk = installedChunks[chunkId];
+function loadingEnded4(): unknown {
+  let returnValue = null;
+  const chunk = installedChunks[chunkId];
   if (chunk !== 0) {
     if (chunk) {
       returnValue = chunk[1];
     }
-    // @ts-ignore installedChunks is part of the scope this is inserted into
     installedChunks[chunkId] = undefined;
   }
   return returnValue;
 }
 
 /**
+ * These properties are missing from the official webpack types
+ */
+type WebpackWeb = typeof webpack & {
+  web: {
+    JsonpTemplatePlugin: {
+      getCompilationHooks(
+        compilation: webpack.compilation.Compilation
+      ): {
+        jsonpScript: SyncWaterfallHook<
+          string,
+          webpack.compilation.Chunk,
+          string
+        >;
+      };
+    };
+  };
+};
+
+/**
  * In webpack 5, the hook moved from the mainTemplate to its own plugin.
  */
-function getWebpackJsonpHook(compilation: webpack.compilation.Compilation) {
-  const {mainTemplate} = compilation;
+function getWebpackJsonpHook(
+  compilation: webpack.compilation.Compilation
+): SyncWaterfallHook<string, webpack.compilation.Chunk, string> {
+  const { mainTemplate } = compilation;
 
-  // @ts-ignore
-  const {JsonpTemplatePlugin} = webpack.web;
+  const { JsonpTemplatePlugin } = (webpack as WebpackWeb).web;
 
   if (!JsonpTemplatePlugin || !JsonpTemplatePlugin.getCompilationHooks) {
     if (!mainTemplate.hooks.jsonpScript) {
       mainTemplate.hooks.jsonpScript = new SyncWaterfallHook([
-        "source",
-        "chunk",
-        "hash"
+        'source',
+        'chunk',
+        'hash',
       ]);
     }
     return mainTemplate.hooks.jsonpScript;

@@ -69,15 +69,20 @@ export interface Chunkset {
   chunks: Chunk[];
 }
 
-function* collectParts(chunkset: Chunkset, options: AssemblyOptions): Generator<Part, void, undefined> {
-  const {includeDeps} = options;
-  const indices = options.chunkIds.concat(options.chunkNames.map(name => {
-    const resolvedIndex = chunkset.names.get(name);
-    if (resolvedIndex === undefined) {
-      throw new Error(`Invalid chunk name ${name}`);
-    }
-    return resolvedIndex;
-  }));
+function* collectParts(
+  chunkset: Chunkset,
+  options: AssemblyOptions
+): Generator<Part, void, undefined> {
+  const { includeDeps } = options;
+  const indices = options.chunkIds.concat(
+    options.chunkNames.map(name => {
+      const resolvedIndex = chunkset.names.get(name);
+      if (resolvedIndex === undefined) {
+        throw new Error(`Invalid chunk name ${name}`);
+      }
+      return resolvedIndex;
+    })
+  );
 
   const visited: Set<number> = new Set();
 
@@ -126,7 +131,10 @@ function concatArrays(arrays: Uint8Array[]): Uint8Array {
  * Extracts chunk part contents from the given `chunkset` and renders them
  * into a full asset, according to the  `options`.
  */
-export function assemble(chunkset: Chunkset, options: AssemblyOptions): Uint8Array {
+export function assemble(
+  chunkset: Chunkset,
+  options: AssemblyOptions
+): Uint8Array {
   const js: Uint8Array[] = [];
 
   for (const part of collectParts(chunkset, options)) {

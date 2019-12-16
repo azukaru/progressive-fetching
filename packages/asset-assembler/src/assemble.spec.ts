@@ -22,16 +22,16 @@ limitations under the License.
 import path from 'path';
 import fs from 'fs';
 
-import {assemble, Chunkset, AssemblyOptions, ContentType} from './index';
+import { assemble, Chunkset, AssemblyOptions, ContentType } from './index';
 
-function toUtf8(array: Uint8Array) {
+function toUtf8(array: Uint8Array): string {
   const decoder = new TextDecoder('utf-8');
   return decoder.decode(array);
 }
 
 describe('assemble', () => {
   it('assembles empty set and empty options to empty string', () => {
-    const empty: Chunkset = {chunks: [], names: new Map()};
+    const empty: Chunkset = { chunks: [], names: new Map() };
     const options: AssemblyOptions = {
       chunkIds: [],
       chunkNames: [],
@@ -59,13 +59,14 @@ describe('assemble', () => {
         const chunksPath = path.join(exampleSetPath, 'chunks');
         for (const chunkFile of fs.readdirSync(chunksPath)) {
           const chunkData = fs.readFileSync(path.join(chunksPath, chunkFile));
-          const [, chunkId, chunkName] = chunkFile.match(/^(\d+)-([^.]+)\.(\w+)$/) ?? [];
+          const [, chunkId, chunkName] =
+            chunkFile.match(/^(\d+)-([^.]+)\.(\w+)$/) ?? [];
           const id = parseInt(chunkId, 10);
           exampleSet.chunks[id] = {
             name: chunkName,
             parts: [
               {
-                getBody() {
+                getBody(): Uint8Array {
                   return chunkData;
                 },
                 dependsOn: [],
@@ -79,13 +80,18 @@ describe('assemble', () => {
       const exampleAssetsPath = path.join(exampleSetPath, 'assets');
       for (const exampleAssetName of fs.readdirSync(exampleAssetsPath)) {
         it(`produces ${exampleAssetName}`, () => {
-          const testCase = fs.readFileSync(path.join(exampleAssetsPath, exampleAssetName), 'utf8');
+          const testCase = fs.readFileSync(
+            path.join(exampleAssetsPath, exampleAssetName),
+            'utf8'
+          );
           const newlineIdx = testCase.indexOf('\n');
           const options: AssemblyOptions = Object.assign(
             {
               chunkIds: [],
               chunkNames: [],
-              contentType: path.extname(exampleAssetName).slice(1) as ContentType,
+              contentType: path
+                .extname(exampleAssetName)
+                .slice(1) as ContentType,
               includeDeps: true,
             },
             JSON.parse(testCase.slice(2, newlineIdx))

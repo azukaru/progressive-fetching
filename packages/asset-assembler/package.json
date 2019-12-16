@@ -17,6 +17,9 @@
   "publishConfig": {
     "registry": "https://wombat-dressing-room.appspot.com"
   },
+  "engines": {
+    "node": ">=12"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azukaru/progressive-fetching.git"
