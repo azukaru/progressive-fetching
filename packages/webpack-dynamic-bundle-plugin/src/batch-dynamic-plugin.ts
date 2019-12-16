@@ -44,7 +44,7 @@ export default class DynamicBundlePlugin {
   }
 
   apply(compiler: webpack.Compiler) {
-    compiler.hooks.compilation.tap(DynamicBundlePlugin.name, (compilation) => {
+    compiler.hooks.compilation.tap(DynamicBundlePlugin.name, (compilation: webpack.compilation.Compilation) => {
       let jsonpScriptHook = getWebpackJsonpHook(compilation);
       jsonpScriptHook.tap(DynamicBundlePlugin.name, () => {
         const {
@@ -106,8 +106,9 @@ export default class DynamicBundlePlugin {
                 // DIFF: We have multiple chunks in the batch, so we have to iterate.
                 // Originally (in webpack 5), the `loadingEnded` function replaces
                 // `chunk.done()`. We capture those callbacks above.
-                "for (var chunk of batch) {",
+                "for (var batchIdx = 0; batchIdx < batch.length; ++batchIdx) {",
                 Template.indent([
+                  "var chunk = batch[batchIdx];",
                   "var reportError = chunk.done();",
                   "if(reportError) {",
                   Template.indent([
@@ -157,13 +158,13 @@ export default class DynamicBundlePlugin {
  */
 function loadingEnded4() {
   var returnValue = null;
-  // @ts-ignore
+  // @ts-ignore installedChunks is part of the scope this is inserted into
   var chunk = installedChunks[chunkId];
   if (chunk !== 0) {
     if (chunk) {
       returnValue = chunk[1];
     }
-    // @ts-ignore
+    // @ts-ignore installedChunks is part of the scope this is inserted into
     installedChunks[chunkId] = undefined;
   }
   return returnValue;
