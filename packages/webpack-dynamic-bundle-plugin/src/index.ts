@@ -15,6 +15,6 @@ limitations under the License.
 */
 
 import DynamicBundlePlugin from './batch-dynamic-plugin';
-import {buildChunksetFromCompilation} from './build-chunkset';
+import { buildChunksetFromCompilation } from './build-chunkset';
 
-export {DynamicBundlePlugin, buildChunksetFromCompilation};
+export { DynamicBundlePlugin, buildChunksetFromCompilation };

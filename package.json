@@ -8,16 +8,29 @@
   "devDependencies": {
     "@types/jest": "^24.0.21",
     "@types/node": "^12.11.2",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-prettier": "^3.1.2",
     "jest": "^24.9.0",
     "lerna": "^3.18.3",
+    "prettier": "^1.19.1",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",
     "typescript": "^3.7.0"
   },
   "dependencies": {},
   "scripts": {
+    "build": "tsc -b packages",
     "publish-all": "lerna publish",
+    "lint": "eslint --fix --ext=js,ts .",
+    "pretest": "yarn build && yarn lint",
     "test": "jest"
+  },
+  "engines": {
+    "node": ">=12"
   },
   "repository": {
     "type": "git",

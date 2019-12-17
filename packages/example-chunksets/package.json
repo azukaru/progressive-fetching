@@ -1,5 +1,8 @@
 {
   "name": "example-chunksets",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=12"
+  },
   "private": true
 }

@@ -18,7 +18,14 @@ import path from 'path';
 
 import webpack from 'webpack';
 
-import {Chunk, Chunkset} from 'asset-assembler';
+import { Chunk, Chunkset } from 'asset-assembler';
+
+function notNull<T>(value: T | null | undefined): T {
+  if (value === null || value === undefined) {
+    throw new Error('Expected value to be non-null');
+  }
+  return value;
+}
 
 /**
  * Create a Chunkset data structure from webpack's build output.
@@ -26,30 +33,32 @@ import {Chunk, Chunkset} from 'asset-assembler';
  * The implementation currently assumes that all chunks have numeric chunk ids
  * without any gaps between chunk ids.
  */
-export function buildChunksetFromCompilation(fs: webpack.InputFileSystem,
+export function buildChunksetFromCompilation(
+  fs: webpack.InputFileSystem,
   outputPath: string,
-  compilation: webpack.compilation.Compilation): Chunkset {
+  compilation: webpack.compilation.Compilation
+): Chunkset {
   const names = new Map<string, number>();
-  const chunkMapping = new Map<any, Chunk>();
+  const chunkMapping = new Map<webpack.compilation.Chunk, Chunk>();
 
   const chunks: Chunk[] = [];
 
   const sortedChunks = [
-    ...(compilation.chunks as webpack.compilation.Chunk[])
-  ].sort(
-    (a, b) => {
-      if (typeof a.id !== 'number' || typeof b.id !== 'number') {
-        throw new Error('Only numeric chunk ids are supported');
-      }
-      return a.id - b.id;
+    ...(compilation.chunks as webpack.compilation.Chunk[]),
+  ].sort((a, b) => {
+    if (typeof a.id !== 'number' || typeof b.id !== 'number') {
+      throw new Error('Only numeric chunk ids are supported');
     }
-  );
+    return a.id - b.id;
+  });
 
   for (const webpackChunk of sortedChunks) {
     const chunkIdx = chunks.length;
     if (chunkIdx !== webpackChunk.id) {
       // This may happen if there are holes in the chunk ids
-      throw new Error(`Expected chunk id ${chunkIdx} but found ${webpackChunk.id}`);
+      throw new Error(
+        `Expected chunk id ${chunkIdx} but found ${webpackChunk.id}`
+      );
     }
     if (webpackChunk.name) {
       names.set(webpackChunk.name, chunkIdx);
@@ -59,7 +68,7 @@ export function buildChunksetFromCompilation(fs: webpack.InputFileSystem,
         return {
           key: -1,
           dependsOn: [],
-          getBody() {
+          getBody(): Buffer {
             const absoluteFile = path.resolve(outputPath, filename);
             const fileContents = fs.readFileSync(absoluteFile);
             return fileContents;
@@ -81,9 +90,9 @@ export function buildChunksetFromCompilation(fs: webpack.InputFileSystem,
       throw new Error('Unexpected chunk name, should match entrypoint');
     }
 
-    const chunk = chunkMapping.get(entryChunk)!;
+    const chunk = notNull(chunkMapping.get(entryChunk));
     for (const depChunk of depChunks) {
-      const chunkIdx = chunks.indexOf(chunkMapping.get(depChunk)!);
+      const chunkIdx = chunks.indexOf(notNull(chunkMapping.get(depChunk)));
       chunk.parts[0].dependsOn.push(chunkIdx);
     }
   }

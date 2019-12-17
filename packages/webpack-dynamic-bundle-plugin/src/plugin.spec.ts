@@ -15,33 +15,35 @@ limitations under the License.
 */
 
 import path from 'path';
-import {promisify} from 'util';
+import { promisify } from 'util';
 
-import {assemble, Chunkset, ContentType} from 'asset-assembler';
+import { assemble, Chunkset, ContentType } from 'asset-assembler';
 import jsdom from 'jsdom';
-import {Volume} from 'memfs';
+import { Volume } from 'memfs';
 import webpack from 'webpack';
 
-import {DynamicBundlePlugin, buildChunksetFromCompilation} from './index';
+import { DynamicBundlePlugin, buildChunksetFromCompilation } from './index';
 
 class ChunksetResourceLoader extends jsdom.ResourceLoader {
   constructor(private chunkset: Chunkset) {
     super();
   }
 
-  async fetch(url: string, options: any) {
+  async fetch(url: string): Promise<Buffer> {
     const staticPrefx = 'https://example.com/static/';
     if (url.startsWith(staticPrefx)) {
       const [chunkName, extension] = url.substr(staticPrefx.length).split('.');
       if (extension !== 'js') {
         return Promise.reject(new Error(`Unsupported batch type ${url}`));
       }
-      return Buffer.from(assemble(this.chunkset, {
-        chunkIds: [],
-        chunkNames: [chunkName],
-        includeDeps: true,
-        contentType: extension as ContentType,
-      }));
+      return Buffer.from(
+        assemble(this.chunkset, {
+          chunkIds: [],
+          chunkNames: [chunkName],
+          includeDeps: true,
+          contentType: extension as ContentType,
+        })
+      );
     }
 
     const dynamicPrefix = 'https://example.com/api/chunks/';
@@ -86,15 +88,14 @@ describe('DynamicBundlePlugin', () => {
         },
       },
       plugins: [
-        new DynamicBundlePlugin(
-          (prefix: string, ids: number[]) => {
-            return `${prefix}/api/chunks/${ids.join(',')}.js`;
-          }
-        ),
+        new DynamicBundlePlugin((prefix: string, ids: number[]) => {
+          return `${prefix}/api/chunks/${ids.join(',')}.js`;
+        }),
       ],
     });
-    const input = Volume.fromJSON({
-      './a-src.js': `\
+    const input = Volume.fromJSON(
+      {
+        './a-src.js': `\
 import "./shared-ab";
 
 console.log("a");\n
@@ -104,16 +105,18 @@ Promise.all([import("./c-src"), import("./d-src")]).then(() => {
   window.onCodeExecuted();
 });
 `,
-      './b-src.js': 'import "./shared-ab";\nconsole.log("b");\n',
-      './c-src.js': 'import "./shared-bc";\nconsole.log("c");\n',
-      './d-src.js': 'console.log("d");\n',
-      './shared-ab.js': 'console.log("shared-ab");\n',
-      './shared-bc.js': 'console.log("shared-bc");\n',
-    }, '/app');
-    // @ts-ignore https://github.com/webpack/memory-fs/issues/67
-    input.join = path.join;
+        './b-src.js': 'import "./shared-ab";\nconsole.log("b");\n',
+        './c-src.js': 'import "./shared-bc";\nconsole.log("c");\n',
+        './d-src.js': 'console.log("d");\n',
+        './shared-ab.js': 'console.log("shared-ab");\n',
+        './shared-bc.js': 'console.log("shared-bc");\n',
+      },
+      '/app'
+    );
+    // See: https://github.com/webpack/memory-fs/issues/67
+    (input as typeof input & { join: typeof path.join }).join = path.join;
     compiler.inputFileSystem = input as webpack.InputFileSystem;
-    compiler.outputFileSystem = input as unknown as webpack.OutputFileSystem;
+    compiler.outputFileSystem = (input as unknown) as webpack.OutputFileSystem;
 
     const stats = await promisify(compiler.run.bind(compiler))();
     expect(stats.compilation.errors).toEqual([]);
@@ -140,8 +143,15 @@ Promise.all([import("./c-src"), import("./d-src")]).then(() => {
       }
     );
     await new Promise((resolve, reject) => {
-      (dom.window as any).onCodeExecuted = resolve;
-      dom.window.document.getElementById('entrypoint')!.addEventListener('error', (e: any) => {
+      Object.assign(dom.window, {
+        onCodeExecuted: resolve,
+      });
+      const entryScript = dom.window.document.getElementById('entrypoint');
+      if (!entryScript) {
+        reject(new Error('Could not find #entrypoint in document'));
+        return;
+      }
+      entryScript.addEventListener('error', (e: ErrorEvent) => {
         reject(e.error || new Error(e.message));
       });
       dom.window.onerror = reject;
