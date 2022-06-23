@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/jsdom": "^12.2.4",
     "@types/webpack": "^4.41.0",
-    "jsdom": "^15.2.1",
+    "jsdom": "^16.5.0",
     "memfs": "^2.16.1",
     "typescript": "^3.7.0",
     "webpack": "^4.41.2"
